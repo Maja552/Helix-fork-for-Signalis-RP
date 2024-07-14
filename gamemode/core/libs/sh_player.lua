@@ -57,6 +57,22 @@ do
 		return false
 	end
 
+	function playerMeta:HasClassWhitelist(class)
+		local data = ix.class.list[class]
+
+		if (data) then
+			if (data.isDefault) then
+				return true
+			end
+
+			local ixData = self:GetData("class_whitelists", {})
+
+			return ixData[Schema.folder] and ixData[Schema.folder][data.uniqueID] == true or false
+		end
+
+		return false
+	end
+
 	function playerMeta:GetItems()
 		local char = self:GetCharacter()
 
@@ -95,6 +111,10 @@ do
 		playerMeta.ixSelectWeapon = playerMeta.ixSelectWeapon or playerMeta.SelectWeapon
 
 		function entityMeta:SetModel(model)
+			if(model == nil) then
+				error("Attempt to set model to nil", 2)
+			end
+
 			local oldModel = self:GetModel()
 
 			if (self:IsPlayer()) then

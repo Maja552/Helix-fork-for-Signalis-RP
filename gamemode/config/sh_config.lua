@@ -15,7 +15,8 @@ ix.config.Add("maxCharacters", 5, "The maximum number of characters a player can
 	data = {min = 1, max = 50},
 	category = "characters"
 })
-ix.config.Add("color", Color(75, 119, 190, 255), "The main color theme for the framework.", function(oldValue, newValue)
+
+ix.config.Add("color", Color(168, 2, 11, 255), "The main color theme for the framework.", function(oldValue, newValue)
 	if (newValue.a != 255) then
 		ix.config.Set("color", ColorAlpha(newValue, 255))
 		return
@@ -25,6 +26,7 @@ ix.config.Add("color", Color(75, 119, 190, 255), "The main color theme for the f
 		hook.Run("ColorSchemeChanged", newValue)
 	end
 end, {category = "appearance"})
+
 ix.config.Add("font", "Roboto Th", "The font used to display titles.", function(oldValue, newValue)
 	if (CLIENT) then
 		hook.Run("LoadFonts", newValue, ix.config.Get("genericFont"))
@@ -95,22 +97,79 @@ ix.config.Add("saveInterval", 300, "How often characters save in seconds.", nil,
 	data = {min = 60, max = 3600},
 	category = "characters"
 })
+
 ix.config.Add("walkSpeed", 130, "How fast a player normally walks.", function(oldValue, newValue)
-	for _, v in player.Iterator()	do
-		v:SetWalkSpeed(newValue)
+	for _, v in ipairs(player.GetAll())	do
+		local character = v:GetCharacter()
+		local speed_mul = 1
+		if character then
+			local class = ix.class.GetClass(character.vars.class)
+
+			if (class and class.speed) then
+				speed_mul = class.speed
+			end
+		end
+		v:SetWalkSpeed(math.Round(newValue * speed_mul))
 	end
 end, {
 	data = {min = 75, max = 500},
 	category = "characters"
 })
+
 ix.config.Add("runSpeed", 235, "How fast a player normally runs.", function(oldValue, newValue)
-	for _, v in player.Iterator()	do
-		v:SetRunSpeed(newValue)
+	for _, v in ipairs(player.GetAll())	do
+		local character = v:GetCharacter()
+		local speed_mul = 1
+		if character then
+			local class = ix.class.GetClass(character.vars.class)
+
+			if (class and class.speed) then
+				speed_mul = class.speed
+			end
+		end
+		v:SetRunSpeed(math.Round(newValue * speed_mul))
 	end
 end, {
 	data = {min = 75, max = 500},
 	category = "characters"
 })
+
+ix.config.Add("jumpPower", 160, "How high a player can jump.", function(oldValue, newValue)
+	for _, v in ipairs(player.GetAll())	do
+		local character = v:GetCharacter()
+		local mul = 1
+		if character then
+			local class = ix.class.GetClass(character.vars.class)
+
+			if (class and class.jump_power) then
+				mul = class.jump_power
+			end
+		end
+		v:SetJumpPower(math.Round(newValue * mul))
+	end
+end, {
+	data = {min = 75, max = 500},
+	category = "characters"
+})
+
+ix.config.Add("ladderClimbSpeed", 70, "How fast a player climbs the ladder.", function(oldValue, newValue)
+	for _, v in ipairs(player.GetAll())	do
+		local character = v:GetCharacter()
+		local mul = 1
+		if character then
+			local class = ix.class.GetClass(character.vars.class)
+
+			if (class and class.speed) then
+				mul = class.speed
+			end
+		end
+		v:SetLadderClimbSpeed(math.Round(newValue * mul))
+	end
+end, {
+	data = {min = 25, max = 300},
+	category = "characters"
+})
+
 ix.config.Add("walkRatio", 0.5, "How fast one goes when holding ALT.", nil, {
 	data = {min = 0, max = 1, decimals = 1},
 	category = "characters"

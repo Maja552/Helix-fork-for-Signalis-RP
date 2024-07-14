@@ -59,6 +59,7 @@ if (SERVER) then
 			query:Insert("last_join_time", data.lastJoinTime)
 			query:Insert("steamid", data.steamID)
 			query:Insert("faction", data.faction or "Unknown")
+			query:Insert("class", data.class or "Unknown")
 			query:Insert("money", data.money)
 			query:Insert("data", util.TableToJSON(data.data or {}))
 			query:Callback(function(result, status, lastID)
@@ -443,13 +444,53 @@ do
 			layout:SetSpaceX(1)
 			layout:SetSpaceY(1)
 
-			local faction = ix.faction.indices[payload.faction]
+			local class = ix.class.list[payload.class]
 
-			if (faction) then
-				local models = faction:GetModels(LocalPlayer())
+			if (class) then
+				local models = class:GetModels(LocalPlayer())
 
 				for k, v in SortedPairs(models) do
+					local icon = layout:Add("DModelPanel")
+					icon:SetSize(128, 256)
+					icon:SetModel(v.mdl)
+					icon.skin = v.skin
+					icon:SetFOV(50)
+					icon:InvalidateLayout(true)
+					icon:SetAnimated(false)
+					icon:SetAnimSpeed(0)
+					icon.DoClick = function(this)
+						payload:Set("model", k)
+					end
+					icon.PaintOver = function(this, w, h)
+						if (payload.model == k) then
+							local color = ix.config.Get("color", color_white)
+
+							surface.SetDrawColor(color.r, color.g, color.b, 200)
+
+							for i = 1, 3 do
+								local i2 = i * 2
+								surface.DrawOutlinedRect(i, i, w - i2, h - i2)
+							end
+						end
+					end
+					icon.PreDrawModel = function(self, ent)
+						ent:SetSkin(self.skin or 0)
+					end
+
+					function icon:LayoutEntity(ent)
+					end
+
+					local headpos = icon.Entity:GetBonePosition(icon.Entity:LookupBone("ValveBiped.Bip01_Head1"))
+					headpos = headpos - Vector(0, 0, 3)
+					icon:SetLookAt(headpos)
+					icon:SetCamPos(headpos + Vector(20, 0, 0))	
+					
+
+
+					
+					/*
 					local icon = layout:Add("SpawnIcon")
+					icon:SetSkinID(v.skin)
 					icon:SetSize(64, 128)
 					icon:InvalidateLayout(true)
 					icon.DoClick = function(this)
@@ -471,18 +512,22 @@ do
 					if (isstring(v)) then
 						icon:SetModel(v)
 					else
-						icon:SetModel(v[1], v[2] or 0, v[3])
+						print(v.skin)
+						icon:SetSkinID(v.skin)
+						icon:SetModel(v.mdl)
+						icon:SetBodyGroup(1, 2)
 					end
+					*/
 				end
 			end
 
 			return scroll
 		end,
 		OnValidate = function(self, value, payload, client)
-			local faction = ix.faction.indices[payload.faction]
+			local class = ix.class.list[payload.class]
 
-			if (faction) then
-				local models = faction:GetModels(client)
+			if (class) then
+				local models = class:GetModels(client)
 
 				if (!payload.model or !models[payload.model]) then
 					return false, "needModel"
@@ -492,32 +537,36 @@ do
 			end
 		end,
 		OnAdjust = function(self, client, data, value, newData)
-			local faction = ix.faction.indices[data.faction]
+			local class = ix.class.list[data.class]
 
-			if (faction) then
-				local model = faction:GetModels(client)[value]
+			if (class) then
+				local model = class:GetModels(client)[value]
 
 				if (isstring(model)) then
 					newData.model = model
+
 				elseif (istable(model)) then
-					newData.model = model[1]
+					newData.model = model.mdl
 
 					-- save skin/bodygroups to character data
 					local bodygroups = {}
 
-					for i = 1, #model[3] do
-						bodygroups[i - 1] = tonumber(model[3][i]) or 0
+					if model.bodygroups then
+						for i = 1, #model.bodygroups do
+							bodygroups[i - 1] = tonumber(model[3][i]) or 0
+						end
 					end
 
 					newData.data = newData.data or {}
-					newData.data.skin = model[2] or 0
+					newData.data.skin = model.skin or 0
 					newData.data.groups = bodygroups
 				end
 			end
 		end,
 		ShouldDisplay = function(self, container, payload)
-			local faction = ix.faction.indices[payload.faction]
-			return #faction:GetModels(LocalPlayer()) > 1
+			local class = ix.class.list[payload["class"]]
+			if(class == nil) then return false end
+			return #class:GetModels(LocalPlayer()) > 1
 		end
 	})
 
@@ -528,7 +577,49 @@ do
 	-- @treturn number Index of the class this character is in
 	-- @function GetClass
 	ix.char.RegisterVar("class", {
+		field = "class",
+		fieldType = ix.type.string,
+		default = "Unknown",
 		bNoDisplay = true,
+		FilterValues = function(self)
+			local values = {}
+
+			for k, v in ipairs(ix.class.list) do
+				values[k] = v.uniqueID
+			end
+
+			return values
+		end,
+		OnSet = function(self, value)
+			local client = self:GetPlayer()
+
+			if (IsValid(client)) then
+				self.vars.class = ix.class.list[value] and ix.class.list[value].uniqueID
+				self.vars.className = ix.class.list[value] and ix.class.list[value].uniqueID
+
+				-- @todo refactor networking of character vars so this doesn't need to be repeated on every OnSet override
+				net.Start("ixCharacterVarChanged")
+					net.WriteUInt(self:GetID(), 32)
+					net.WriteString("class")
+					net.WriteType(self.vars.class)
+				net.Broadcast()
+			end
+		end,
+		OnGet = function(self, default)
+			local class = ix.class.list[self.vars.class]
+
+			return class and class.uniqueID or 0
+		end,
+		OnValidate = function(self, index, data, client)
+			if (index and client:HasClassWhitelist(index)) then
+				return true
+			end
+
+			return false
+		end,
+		OnAdjust = function(self, client, data, value, newData)
+			newData.class = ix.class.list[value].uniqueID
+		end
 	})
 
 	--- Sets this character's faction. Note that this doesn't do the initial setup for the player after the faction has been
@@ -544,7 +635,7 @@ do
 	ix.char.RegisterVar("faction", {
 		field = "faction",
 		fieldType = ix.type.string,
-		default = "Citizen",
+		default = "Gestalt",
 		bNoDisplay = true,
 		FilterValues = function(self)
 			-- make sequential table of faction unique IDs
@@ -625,15 +716,47 @@ do
 			y = totalBar:GetTall() + 4
 
 			for k, v in SortedPairsByMemberValue(ix.attributes.list, "name") do
-				payload.attributes[k] = 0
+				local class = ix.class.Get(payload.class)
+
+				local startingValue = 0
+				local minValue = 0
+				local maxValue = maximum
+
+				if isstring(v.defaultValue) then
+					startingValue = v.defaultValue
+
+				elseif isfunction(v.defaultValue) then
+					startingValue = v.defaultValue(class)
+				end
+
+				if isstring(v.minValue) then
+					minValue = v.minValue
+
+				elseif isfunction(v.minValue) then
+					minValue = v.minValue(class)
+				end
+
+				if isstring(v.maxValue) then
+					maxValue = v.maxValue
+
+				elseif isfunction(v.maxValue) then
+					maxValue = v.maxValue(class)
+				end
 
 				local bar = attributes:Add("ixAttributeBar")
-				bar:SetMax(maximum)
+
+				payload.attributes[k] = startingValue
+				bar.value = startingValue
+				total = total + startingValue
+				totalBar:SetValue(totalBar.value - startingValue)
+
+				bar:SetMax(maxValue)
 				bar:Dock(TOP)
 				bar:DockMargin(2, 2, 2, 2)
 				bar:SetText(L(v.name))
 				bar.OnChanged = function(this, difference)
-					if ((total + difference) > maximum) then
+					if ((total + difference) > maxValue)
+					or ((total + difference) < minValue) then
 						return false
 					end
 
@@ -643,7 +766,7 @@ do
 					totalBar:SetValue(totalBar.value - difference)
 				end
 
-				if (v.noStartBonus) then
+				if (v.noStartBonus or minValue == maxValue) then
 					bar:SetReadOnly()
 				end
 
@@ -1126,6 +1249,8 @@ do
 		end)
 
 		net.Receive("ixCharacterLoadFailure", function()
+			surface.PlaySound("signalis_ui/no.wav")
+
 			local message = net.ReadString()
 
 			if (isstring(message) and message:sub(1, 1) == "@") then

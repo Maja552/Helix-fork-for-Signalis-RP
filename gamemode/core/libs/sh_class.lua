@@ -45,6 +45,8 @@ function ix.class.LoadFromDir(directory)
 			CLASS.description = "No description available."
 			CLASS.limit = 0
 
+			CLASS.models = CLASS.models
+
 			-- For future use with plugins.
 			if (PLUGIN) then
 				CLASS.plugin = PLUGIN.uniqueID
@@ -64,6 +66,18 @@ function ix.class.LoadFromDir(directory)
 			if (!CLASS.CanSwitchTo) then
 				CLASS.CanSwitchTo = function(client)
 					return true
+				end
+			end
+
+			if istable(CLASS.models) then
+				for _, v2 in pairs(CLASS.models) do
+					util.PrecacheModel(v2.mdl)
+				end
+			end
+
+			if (!CLASS.GetModels) then
+				function CLASS:GetModels(client)
+					return self.models
 				end
 			end
 
@@ -115,6 +129,20 @@ end
 -- @treturn table Class table
 function ix.class.Get(identifier)
 	return ix.class.list[identifier]
+end
+
+--- Retrieves a class table.
+-- @realm shared
+-- @number identifier Index of the class
+-- @treturn table Class table
+function ix.class.GetClass(identifier)
+	for k,v in pairs(ix.class.list) do
+		if v.uniqueID == identifier then
+			return v
+		end
+	end
+
+	return nil
 end
 
 --- Retrieves the players in a class
@@ -198,5 +226,27 @@ if (SERVER) then
 		net.Start("ixClassUpdate")
 			net.WriteEntity(client)
 		net.Broadcast()
+	end
+end
+
+if CLIENT then
+	--- Returns true if a class requires a whitelist.
+	-- @realm client
+	-- @number class Index of the faction
+	-- @treturn bool Whether or not the class requires a whitelist
+	function ix.class.HasClassWhitelist(class)
+		local data = ix.class.list[class]
+
+		if (data) then
+			if (data.isDefault) then
+				return true
+			end
+
+			local ixData = ix.localData and ix.localData.class_whitelists or {}
+
+			return ixData[Schema.folder] and ixData[Schema.folder][data.uniqueID] == true or false
+		end
+
+		return false
 	end
 end

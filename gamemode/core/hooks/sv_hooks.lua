@@ -6,13 +6,17 @@ function GM:PlayerInitialSpawn(client)
 
 	if (client:IsBot()) then
 		local botID = os.time() + client:EntIndex()
-		local index = math.random(1, table.Count(ix.faction.indices))
-		local faction = ix.faction.indices[index]
+		
+		local faction_index = math.random(1, table.Count(ix.faction.indices))
+		local class_index = math.random(1, table.Count(ix.class.list))
+
+		local faction = ix.faction.indices[faction_index]
+		local class = ix.class.indices[class_index]
 
 		local character = ix.char.New({
 			name = client:Name(),
 			faction = faction and faction.uniqueID or "unknown",
-			model = faction and table.Random(faction:GetModels(client)) or "models/gman.mdl"
+			model = faction and table.Random(class:GetModels(client)) or "models/gman.mdl"
 		}, botID, client, client:SteamID64())
 		character.isBot = true
 
@@ -262,11 +266,11 @@ function GM:PlayerLoadedCharacter(client, character, lastChar)
 		lastChar:SetVar("charEnts", nil)
 	end
 
+	-- the hell is this code even supposed to do?? :sob:
 	if (character) then
 		for _, v in pairs(ix.class.list) do
-			if (v.faction == client:Team() and v.isDefault) then
+			if (v.uniqueID == character.vars.class and v.isDefault) then
 				character:SetClass(v.index)
-
 				break
 			end
 		end
@@ -505,9 +509,48 @@ function GM:PlayerLoadout(client)
 		-- Set their player model to the character's model.
 		client:SetModel(character:GetModel())
 		client:Give("ix_hands")
-		client:SetWalkSpeed(ix.config.Get("walkSpeed"))
-		client:SetRunSpeed(ix.config.Get("runSpeed"))
-		client:SetHealth(character:GetData("health", client:GetMaxHealth()))
+
+		local class = ix.class.GetClass(character.vars.class)
+
+		local speed_mul = 1
+		if (class and class.speed) then
+			speed_mul = class.speed
+		end
+
+		local jump_mul = 1
+		if (class and class.jump_power) then
+			jump_mul = class.jump_power
+		end
+
+		local health = character:GetData("health", client:GetMaxHealth())
+		if (class and class.health) then
+			health = class.health
+		end
+
+		client.thirst = character:GetData("thirst", client:GetMaxThirst())
+		client.hunger = character:GetData("hunger", client:GetMaxHunger())
+		client.sleepiness = character:GetData("sleepiness", client:GetMaxSleepiness())
+		client.infectionProgress = character:GetData("infectionProgress", 0)
+		client.asymptomatic = character:GetData("asymptomatic", false)
+
+		/*
+		for k,v in pairs(class:GetModels()) do
+			if v.mdl == client:GetModel() then
+				if v.hullMins and v.hullMaxs then
+					client:SetHull(v.hullMins, v.hullMaxs)
+				end
+				break
+			end
+		end
+		*/
+		
+		client:SetLadderClimbSpeed(math.Round(ix.config.Get("ladderClimbSpeed") * speed_mul))
+		client:SetWalkSpeed(math.Round(ix.config.Get("walkSpeed") * speed_mul))
+		client:SetRunSpeed(math.Round(ix.config.Get("runSpeed") * speed_mul))
+		client:SetJumpPower(math.Round(ix.config.Get("jumpPower") * jump_mul))
+		
+		client:SetHealth(health)
+		client:SetMaxHealth(health)
 
 		local faction = ix.faction.indices[client:Team()]
 
@@ -874,6 +917,11 @@ function GM:CharacterPreSave(character)
 	end
 
 	character:SetData("health", client:Alive() and client:Health() or nil)
+	character:SetData("thirst", client.thirst or nil)
+	character:SetData("hunger", client.hunger or nil)
+	character:SetData("sleepiness", client.sleepiness or nil)
+	character:SetData("infectionProgress", client.infectionProgress or nil)
+	character:SetData("asymptomatic", client.asymptomatic or nil)
 end
 
 timer.Create("ixLifeGuard", 1, 0, function()
