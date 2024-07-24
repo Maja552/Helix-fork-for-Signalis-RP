@@ -692,6 +692,16 @@ do
 			local class = ix.class.Get(payload.class)
 
 			if class and class.remove_attributes == true then
+				payload.attributes = {}
+				for k, v in SortedPairsByMemberValue(ix.attributes.list, "name") do
+					if isstring(v.defaultValue) then
+						startingValue = v.defaultValue
+
+					elseif isfunction(v.defaultValue) then
+						startingValue = v.defaultValue(class)
+					end
+					payload.attributes[k] = startingValue
+				end
 				return
 			end
 
@@ -722,7 +732,6 @@ do
 			y = totalBar:GetTall() + 4
 
 			for k, v in SortedPairsByMemberValue(ix.attributes.list, "name") do
-
 				local startingValue = 0
 				local minValue = 0
 				local maxValue = maximum
