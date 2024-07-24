@@ -174,6 +174,14 @@ function PANEL:Init()
 				end
 
 				local maximum = v.maxValue or ix.config.Get("maxAttributes", 100)
+				if isfunction(maximum) then
+					for k2, v2 in pairs(ix.class.list) do
+						if character.vars.class == v2.uniqueID then
+							maximum = maximum(v2)
+						end
+					end
+				end
+
 				bar:SetMax(maximum)
 				bar:SetReadOnly()
 				bar:SetText(Format("%s [%.1f/%.1f] (%.1f%%)", L(v.name), value, maximum, value / maximum * 100))
