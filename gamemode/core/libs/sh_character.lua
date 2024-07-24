@@ -734,15 +734,21 @@ do
 					if isstring(v.minValue) then
 						minValue = v.minValue
 	
-					elseif isfunction(v.minValue) then
+					elseif isfunction(v.minValue) and v.minValue(class) then
 						minValue = v.minValue(class)
+					
+					elseif isnumber(v.minPossibleValue) then
+						minValue = v.minPossibleValue
 					end
 	
 					if isstring(v.maxValue) then
 						maxValue = v.maxValue
 	
-					elseif isfunction(v.maxValue) then
+					elseif isfunction(v.maxValue) and v.maxValue(class) then
 						maxValue = v.maxValue(class)
+
+					elseif isnumber(v.maxPossibleValue) then
+						maxValue = v.maxPossibleValue
 					end
 				end
 
@@ -769,7 +775,7 @@ do
 					totalBar:SetValue(totalBar.value - difference)
 				end
 
-				if (v.noStartBonus or minValue == maxValue) then
+				if (minValue == maxValue) or (isfunction(v.noStartBonus) and class and v.noStartBonus(class)) or (isbool(v.noStartBonus) and v.noStartBonus) then
 					bar:SetReadOnly()
 				end
 
