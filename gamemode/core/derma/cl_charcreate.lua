@@ -46,8 +46,9 @@ function PANEL:Init()
 		self.classPanel.title:SetTextColor(faction.color or color_white)
 
 		self:Populate(true)
-		if (#self.classButtons == 1) then
+		if (#self.classButtons < 2) then
 			self:SetActiveSubpanel("description")
+			self.progress:IncrementProgress()
 		else
 			self:SetActiveSubpanel("class")
 		end
@@ -186,6 +187,10 @@ function PANEL:Init()
 
 		self.progress:DecrementProgress()
 
+		if (#self.classButtons < 2) then
+			self.progress:DecrementProgress()
+		end
+
 		if (#self.factionButtons == 1) then
 			factionBack:DoClick()
 		else
@@ -221,7 +226,6 @@ function PANEL:Init()
 		end
 	end
 
-	-- attributes subpanel
 	self.attributes = self:AddSubpanel("attributes")
 	self.attributes:SetTitle("chooseSkills")
 
@@ -476,6 +480,31 @@ function PANEL:populateClassButtons()
 	end
 end
 
+function PANEL:PopulateSegments()
+	self.progress.progress = 0
+	self.progress.segments = {}
+
+	-- setup progress bar segments
+	if (#self.factionButtons > 1) then
+		self.progress:AddSegment("@faction")
+	end
+	
+	--if (#self.classButtons > 1) then
+		self.progress:AddSegment("@class")
+	--end
+
+	self.progress:AddSegment("@description")
+
+	if (#self.attributesPanel:GetChildren() > 1) then
+		self.progress:AddSegment("@skills")
+	end
+
+	-- we don't need to show the progress bar if there's only one segment
+	if (#self.progress:GetSegments() == 1) then
+		self.progress:SetVisible(false)
+	end
+end
+
 function PANEL:Populate(redo)
 	if (!self.bInitialPopulate or redo) then
 		-- setup buttons for the faction panel
@@ -503,6 +532,8 @@ function PANEL:Populate(redo)
 				button:SetButtonList(self.factionButtons)
 				button.faction = v.index
 				button.OnSelected = function(panel)
+					--self:PopulateSegments()
+
 					self.classModel:SetModel("models/error.mdl")
 
 					local faction = ix.faction.indices[panel.faction]
@@ -547,7 +578,6 @@ function PANEL:Populate(redo)
 				end
 			end
 		end
-
 
 		self:populateClassButtons()
 	end
@@ -625,25 +655,7 @@ function PANEL:Populate(redo)
 	end
 
 	if (!self.bInitialPopulate) then
-		-- setup progress bar segments
-		if (#self.factionButtons > 1) then
-			self.progress:AddSegment("@faction")
-		end
-		
-		if (#self.classButtons > 1) then
-			self.progress:AddSegment("@class")
-		end
-
-		self.progress:AddSegment("@description")
-
-		if (#self.attributesPanel:GetChildren() > 1) then
-			self.progress:AddSegment("@skills")
-		end
-
-		-- we don't need to show the progress bar if there's only one segment
-		if (#self.progress:GetSegments() == 1) then
-			self.progress:SetVisible(false)
-		end
+		self:PopulateSegments()
 	end
 
 	self.bInitialPopulate = true

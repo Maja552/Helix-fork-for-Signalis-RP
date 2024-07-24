@@ -689,6 +689,12 @@ do
 		category = "attributes",
 		isLocal = true,
 		OnDisplay = function(self, container, payload)
+			local class = ix.class.Get(payload.class)
+
+			if class and class.remove_attributes == true then
+				return
+			end
+
 			local maximum = hook.Run("GetDefaultAttributePoints", LocalPlayer(), payload) or 10
 
 			if (maximum < 1) then
@@ -716,7 +722,6 @@ do
 			y = totalBar:GetTall() + 4
 
 			for k, v in SortedPairsByMemberValue(ix.attributes.list, "name") do
-				local class = ix.class.Get(payload.class)
 
 				local startingValue = 0
 				local minValue = 0
