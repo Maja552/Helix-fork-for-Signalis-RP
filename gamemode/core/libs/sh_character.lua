@@ -722,25 +722,28 @@ do
 				local minValue = 0
 				local maxValue = maximum
 
-				if isstring(v.defaultValue) then
-					startingValue = v.defaultValue
+				-- Class NEEDS to be checked because if not, it becomes nil while going back in char creation progress
+				if class then
+					if isstring(v.defaultValue) then
+						startingValue = v.defaultValue
 
-				elseif isfunction(v.defaultValue) then
-					startingValue = v.defaultValue(class)
-				end
+					elseif isfunction(v.defaultValue) then
+						startingValue = v.defaultValue(class)
+					end
 
-				if isstring(v.minValue) then
-					minValue = v.minValue
-
-				elseif isfunction(v.minValue) then
-					minValue = v.minValue(class)
-				end
-
-				if isstring(v.maxValue) then
-					maxValue = v.maxValue
-
-				elseif isfunction(v.maxValue) then
-					maxValue = v.maxValue(class)
+					if isstring(v.minValue) then
+						minValue = v.minValue
+	
+					elseif isfunction(v.minValue) then
+						minValue = v.minValue(class)
+					end
+	
+					if isstring(v.maxValue) then
+						maxValue = v.maxValue
+	
+					elseif isfunction(v.maxValue) then
+						maxValue = v.maxValue(class)
+					end
 				end
 
 				local bar = attributes:Add("ixAttributeBar")
