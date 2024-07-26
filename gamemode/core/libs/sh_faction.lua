@@ -71,7 +71,7 @@ if (CLIENT) then
 		local data = ix.faction.indices[faction]
 
 		if (data) then
-			if (data.isDefault) then
+			if (data.isDefault or data.availableByDefault) then
 				return true
 			end
 
