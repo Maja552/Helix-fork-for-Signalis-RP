@@ -115,10 +115,6 @@ function ix.class.CanSwitchTo(client, class)
 		end
 	end
 
-	if (hook.Run("CanPlayerJoinClass", client, class, info) == false) then
-		return false
-	end
-
 	-- See if the class allows the player to join it.
 	return info:CanSwitchTo(client)
 end
@@ -238,7 +234,7 @@ if CLIENT then
 		local data = ix.class.list[class]
 
 		if (data) then
-			if (data.isDefault) then
+			if (data.isDefault or data.availableByDefault) then
 				return true
 			end
 
