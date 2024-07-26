@@ -405,6 +405,17 @@ function GM:OnCharacterCreated(client, character)
 	if (faction and faction.OnCharacterCreated) then
 		faction:OnCharacterCreated(client, character)
 	end
+
+	local class = character.vars.class
+
+	for k,v in pairs(ix.class.list) do
+		if (v.uniqueID == class) then
+			if (v.OnCharacterCreated) then
+				v:OnCharacterCreated(client, character)
+			end
+			break
+		end
+	end
 end
 
 function GM:GetDefaultCharacterName(client, faction)
