@@ -440,6 +440,15 @@ function GM:CanPlayerUseCharacter(client, character)
 
 		return false, "@charBanned"
 	end
+	
+	for k,v in pairs(ix.faction.indices) do
+		if (k == character:GetFaction()) then
+			if (v.availableByDefault) then
+				return true
+			end
+			break
+		end
+	end
 
 	local bHasWhitelist = client:HasWhitelist(character:GetFaction())
 
