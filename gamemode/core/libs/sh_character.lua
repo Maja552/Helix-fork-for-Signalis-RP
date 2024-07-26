@@ -611,6 +611,15 @@ do
 			return class and class.uniqueID or 0
 		end,
 		OnValidate = function(self, index, data, client)
+			for k,v in pairs(ix.class.list) do
+				if k == index then
+					if v.availableByDefault then
+						return true
+					end
+					break
+				end
+			end
+
 			if (index and client:HasClassWhitelist(index)) then
 				return true
 			end
@@ -669,6 +678,15 @@ do
 			return faction and faction.index or 0
 		end,
 		OnValidate = function(self, index, data, client)
+			for k,v in pairs(ix.faction.indices) do
+				if k == index then
+					if v.availableByDefault then
+						return true
+					end
+					break
+				end
+			end
+
 			if (index and client:HasWhitelist(index)) then
 				return true
 			end
