@@ -480,11 +480,14 @@ do
 					function icon:LayoutEntity(ent)
 					end
 
-					local headpos = icon.Entity:GetBonePosition(icon.Entity:LookupBone("ValveBiped.Bip01_Head1"))
-					headpos = headpos - Vector(0, 0, 3)
-					icon:SetLookAt(headpos)
-					icon:SetCamPos(headpos + Vector(20, 0, 0))	
-					
+					local bone =  icon.Entity:LookupBone("ValveBiped.Bip01_Head1")
+
+					if (bone) then
+						local headpos = icon.Entity:GetBonePosition(bone)
+						headpos = headpos - Vector(0, 0, 3)
+						icon:SetLookAt(headpos)
+						icon:SetCamPos(headpos + Vector(20, 0, 0))
+					end
 
 
 					
