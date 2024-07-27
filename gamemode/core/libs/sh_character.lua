@@ -488,8 +488,6 @@ do
 						icon:SetLookAt(headpos)
 						icon:SetCamPos(headpos + Vector(20, 0, 0))
 					end
-
-
 					
 					/*
 					local icon = layout:Add("SpawnIcon")
