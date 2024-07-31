@@ -267,6 +267,7 @@ LANGUAGE = {
 	weaponSlotFilled = "You cannot use another %s weapon!",
 	equippedBag = "You cannot move a bag that has an equipped item!",
 	equippedWeapon = "You cannot move a weapon that is currently equipped!",
+	notAcceptedBag = "This container doesn't accept this type of item!",
 	nestedBags = "You cannot put an inventory inside of a storage inventory!",
 	outfitAlreadyEquipped = "You're already wearing this kind of outfit!",
 	useTip = "Uses the item.",
