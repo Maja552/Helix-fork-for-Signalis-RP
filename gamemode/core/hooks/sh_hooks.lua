@@ -549,31 +549,33 @@ function GM:Move(client, moveData)
 end
 
 function GM:CanTransferItem(itemObject, curInv, inventory)
-	for k,v in pairs(ix.item.list) do
-		if k == inventory.vars.isBag then
-			if istable(v.AcceptableItems) then
+	if inventory and inventory.vars then
+		for k,v in pairs(ix.item.list) do
+			if k == inventory.vars.isBag then
+				if istable(v.AcceptableItems) then
 
-				local acceptable = false
-				for k2, v2 in pairs(v.AcceptableItems) do
-					if itemObject.uniqueID == k2 then
-						if v2 then
-							acceptable = true
+					local acceptable = false
+					for k2, v2 in pairs(v.AcceptableItems) do
+						if itemObject.uniqueID == k2 then
+							if v2 then
+								acceptable = true
+							end
+							break
 						end
-						break
+					end
+
+					if !acceptable then
+						local owner = itemObject:GetOwner()
+
+						if (IsValid(owner)) then
+							owner:NotifyLocalized("notAcceptedBag")
+						end
+						return false
 					end
 				end
 
-				if !acceptable then
-					local owner = itemObject:GetOwner()
-
-					if (IsValid(owner)) then
-						owner:NotifyLocalized("notAcceptedBag")
-					end
-					return false
-				end
+				break
 			end
-
-			break
 		end
 	end
 
