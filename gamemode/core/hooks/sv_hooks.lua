@@ -373,9 +373,9 @@ end
 function GM:PlayerSpawnSWEP(client, weapon, info)
 	return client:IsAdmin()
 end
-
+	
 function GM:PlayerSpawnProp(client)
-	if (client:GetCharacter() and client:GetCharacter():HasFlags("e")) then
+	if client:IsSuperAdmin() or (client:GetCharacter() and client:GetCharacter():HasFlags("e")) then
 		return true
 	end
 
@@ -383,7 +383,7 @@ function GM:PlayerSpawnProp(client)
 end
 
 function GM:PlayerSpawnRagdoll(client)
-	if (client:GetCharacter() and client:GetCharacter():HasFlags("r")) then
+	if client:IsSuperAdmin() or (client:GetCharacter() and client:GetCharacter():HasFlags("r")) then
 		return true
 	end
 
@@ -391,6 +391,8 @@ function GM:PlayerSpawnRagdoll(client)
 end
 
 function GM:PlayerSpawnVehicle(client, model, name, data)
+	if client:IsSuperAdmin() then return true end
+
 	if (client:GetCharacter()) then
 		if (data.Category == "Chairs") then
 			return client:GetCharacter():HasFlags("c")
