@@ -39,7 +39,7 @@ end
 -- @number amount The amount of cash being spawned.
 -- @angle[opt=angle_zero] angle The angle of the entity being spawned.
 -- @treturn entity The spawned money entity.
-function ix.currency.Spawn(pos, amount, angle)
+function ix.currency.Spawn(pos, amount, angle, mdl)
 	if (!amount or amount < 0) then
 		print("[Helix] Can't create currency entity: Invalid Amount of money")
 		return
@@ -61,6 +61,9 @@ function ix.currency.Spawn(pos, amount, angle)
 	-- double check for negative.
 	money:SetAmount(math.Round(math.abs(amount)))
 	money:SetAngles(angle or angle_zero)
+	if mdl then
+		money:SetModel(mdl)
+	end
 	money:Activate()
 
 	return money

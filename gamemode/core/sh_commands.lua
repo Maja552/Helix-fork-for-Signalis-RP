@@ -494,6 +494,21 @@ do
 
 				client:GetCharacter():TakeMoney(amount)
 
+				if isfunction(MoneySort) then
+					local money = MoneySort(amount)
+
+					local addPos = 0
+					for k,v in pairs(money) do
+						local money = ix.currency.Spawn(client, (v.amount * v.value), angle_zero, v.mdl)
+						money.ixCharID = client:GetCharacter():GetID()
+						money.ixSteamID = client:SteamID()
+						money:SetPos(money:GetPos() + Vector(0, 0, addPos))
+						addPos = addPos + 5
+					end
+
+					return
+				end
+
 				local money = ix.currency.Spawn(client, amount)
 				money.ixCharID = client:GetCharacter():GetID()
 				money.ixSteamID = client:SteamID()
