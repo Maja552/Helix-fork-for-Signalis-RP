@@ -569,7 +569,7 @@ do
 		volume = 0.5,
 		level = 80,
 		pitch = {95, 105},
-		sound = bRollover and "eternalis/signalis_ui/select.wav" or "ui/buttonrollover.wav"
+		sound = bRollover and "signalis_ui/select.wav" or "ui/buttonrollover.wav"
 	})
 
 	sound.Add({
