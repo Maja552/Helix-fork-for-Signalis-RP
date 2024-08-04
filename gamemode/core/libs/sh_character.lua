@@ -1291,7 +1291,7 @@ do
 		end)
 
 		net.Receive("ixCharacterLoadFailure", function()
-			surface.PlaySound("signalis_ui/no.wav")
+			surface.PlaySound("eternalis/signalis_ui/no.wav")
 
 			local message = net.ReadString()
 
