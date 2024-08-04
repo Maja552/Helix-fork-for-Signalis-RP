@@ -543,8 +543,8 @@ end
 do
 	-- check if sounds exist, otherwise fall back to default UI sounds
 	local bWhoosh = file.Exists("sound/helix/ui/whoosh1.wav", "GAME")
-	local bRollover = file.Exists("sound/signalis_ui/select.wav", "GAME")
-	local bPress = file.Exists("sound/signalis_ui/confirm.wav", "GAME")
+	local bRollover = file.Exists("sound/eternalis/ui/cannot.wav", "GAME")
+	local bPress = file.Exists("sound/eternalis/ui/select.wav", "GAME")
 	local bNotify = file.Exists("sound/helix/ui/REPLACEME.wav", "GAME") -- @todo
 
 	sound.Add({
@@ -569,7 +569,7 @@ do
 		volume = 0.5,
 		level = 80,
 		pitch = {95, 105},
-		sound = bRollover and "signalis_ui/select.wav" or "ui/buttonrollover.wav"
+		sound = bRollover and "eternalis/ui/cannot.wav" or "ui/buttonrollover.wav"
 	})
 
 	sound.Add({
@@ -578,7 +578,7 @@ do
 		volume = 0.5,
 		level = 80,
 		pitch = bPress and {95, 110} or 100,
-		sound = bPress and "signalis_ui/confirm.wav" or "ui/buttonclickrelease.wav"
+		sound = bPress and "eternalis/signalis_ui/confirm.wav" or "ui/buttonclickrelease.wav"
 	})
 
 	sound.Add({

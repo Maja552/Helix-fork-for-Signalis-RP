@@ -1157,7 +1157,7 @@ end
 -- chatbox panel hooks
 -- called when the textentry value changes
 function PANEL:OnTextChanged(text)
-	surface.PlaySound("signalis_ui/keyboard_tap.wav")
+	surface.PlaySound("eternalis/environment/mechanics/keyboard/keyboard_tap.wav")
 	hook.Run("ChatTextChanged", text)
 
 	local preview = self.preview
