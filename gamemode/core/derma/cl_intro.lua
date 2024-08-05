@@ -319,10 +319,6 @@ function PANEL:OnRemove()
 	if (IsValid(self.channel)) then
 		self.channel:Stop()
 	end
-
-	if (IsValid(ix.gui.characterMenu)) then
-		ix.gui.characterMenu:PlayMusic()
-	end
 end
 
 function PANEL:Remove(bForce)

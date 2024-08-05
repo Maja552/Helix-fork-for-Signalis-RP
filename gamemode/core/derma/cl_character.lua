@@ -376,40 +376,7 @@ function PANEL:Init()
 
 	ix.gui.characterMenu = self
 
-	if (!IsValid(ix.gui.intro)) then
-		self:PlayMusic()
-	end
-
 	hook.Run("OnCharacterMenuCreated", self)
-end
-
-function PANEL:PlayMusic()
-	local path = "sound/" .. ix.config.Get("music")
-	local url = path:match("http[s]?://.+")
-	local play = url and sound.PlayURL or sound.PlayFile
-	path = url and url or path
-
-	play(path, "noplay", function(channel, error, message)
-		if (!IsValid(self) or !IsValid(channel)) then
-			return
-		end
-
-		channel:SetVolume(self.volume or 0)
-		channel:Play()
-
-		self.channel = channel
-
-		self:CreateAnimation(audioFadeInTime, {
-			index = 10,
-			target = {volume = 1},
-
-			Think = function(animation, panel)
-				if (IsValid(panel.channel)) then
-					panel.channel:SetVolume(self.volume * 0.5)
-				end
-			end
-		})
-	end)
 end
 
 function PANEL:ShowNotice(type, text)
