@@ -775,6 +775,10 @@ ix.command.Add("BecomeClass", {
 	description = "@cmdBecomeClass",
 	arguments = ix.type.text,
 	OnRun = function(self, client, class)
+		if client:IsAdmin() then
+			return "@noPerm"
+		end
+
 		local character = client:GetCharacter()
 
 		if (character) then

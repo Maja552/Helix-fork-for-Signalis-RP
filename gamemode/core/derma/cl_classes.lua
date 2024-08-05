@@ -17,7 +17,6 @@ function PANEL:Init()
 		end
 	end
 
-
 	self.icon = self:Add("SpawnIcon")
 	self.icon:SetSize(128, 64)
 	self.icon:InvalidateLayout(true)
@@ -61,14 +60,15 @@ function PANEL:SetNumber(number)
 end
 
 function PANEL:SetClass(data)
-	if (data.model) then
-		local model = data.model
+	if (data.models) then
+		local model = data.models
 
 		if (istable(model)) then
 			model = table.Random(model)
 		end
 
 		self.icon:SetModel(model.mdl)
+
 	else
 		local char = LocalPlayer():GetCharacter()
 		local model = LocalPlayer():GetModel()
@@ -126,6 +126,8 @@ end
 vgui.Register("ixClasses", PANEL, "EditablePanel")
 
 hook.Add("CreateMenuButtons", "ixClasses", function(tabs)
+	if !LocalPlayer():IsAdmin() then return end
+
 	local cnt = table.Count(ix.class.list)
 
 	if (cnt <= 1) then return end
