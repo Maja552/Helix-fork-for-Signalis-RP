@@ -475,6 +475,9 @@ do
 					end
 					icon.PreDrawModel = function(self, ent)
 						ent:SetSkin(self.skin or 0)
+						if v.bodygroups then
+							ent:SetBodyGroups(v.bodygroups)
+						end
 					end
 
 					function icon:LayoutEntity(ent)
