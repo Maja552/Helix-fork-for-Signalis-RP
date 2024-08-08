@@ -47,6 +47,10 @@ function PANEL:Init()
 	factionProceed.DoClick = function()
 		self.progress:IncrementProgress()
 
+		if IsValid(self.statsPanel) then
+			self.statsPanel.ResetParams(self.statsPanel)
+		end
+
 		local faction = ix.faction.indices[self.payload["faction"]]
 		self.classPanel.title:SetTextColor(faction.color or color_white)
 
@@ -100,6 +104,16 @@ function PANEL:Init()
 	self.statsPanel:Dock(RIGHT)
 	self.statsPanel:SetWidth(statsPanelWidth)
 	self.statsPanel.spaceBetween = 38
+	self.statsPanel.ResetParams = function(self)
+		descriptionPage = 1
+		classDescription = ''
+		classStats = nil
+		self.stats = nil
+		self.statsY = 0
+		if IsValid(classDescriptionText) then
+			classDescriptionText:SetText("")
+		end
+	end
 	self.statsPanel.statsY = 0
 	self.statsPanel.stats = nil
 	self.statsPanel:SetMouseInputEnabled(true)
@@ -218,6 +232,10 @@ function PANEL:Init()
 	classBack.DoClick = function()
 		self.payload["class"] = nil
 		self.payload["model"] = nil
+		
+		if IsValid(self.statsPanel) then
+			self.statsPanel.ResetParams(self.statsPanel)
+		end
 
 		self.progress:DecrementProgress()
 
@@ -255,6 +273,10 @@ function PANEL:Init()
 	descriptionBack.DoClick = function()
 		self.payload["class"] = nil
 		self.payload["model"] = nil
+
+		descriptionPage = 1
+		classDescription = ''
+		classStats = nil
 
 		self.progress:DecrementProgress()
 
@@ -705,6 +727,17 @@ function PANEL:Populate(redo)
 			end
 
 			if (IsValid(panel)) then
+				if v.hint then
+					panel:SetTooltip(L(v.hint))
+
+					local hint = panel:Add("DLabel")
+					hint:SetFont("ixMenuButtonLabelFont")
+					hint:SetText(L(v.hint))
+					hint:SizeToContents()
+					hint:DockMargin(0, 2, 0, 0)
+					hint:Dock(TOP)
+				end
+
 				-- add label for entry
 				local label = container:Add("DLabel")
 				label:SetFont("ixMenuButtonLabelFont")
