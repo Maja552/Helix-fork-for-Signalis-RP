@@ -459,5 +459,7 @@ LANGUAGE = {
 	iconEditorAlignFront = "Align from Front",
 	iconEditorAlignAbove = "Align from Above",
 	iconEditorAlignRight = "Align from Right",
-	iconEditorAlignCenter = "Align from Center"
+	iconEditorAlignCenter = "Align from Center",
+
+	nameHint = "For replikas, use the format: XXXR-HYY like EULR-H14, ARAR-H07, don't set nicknames here.",
 }

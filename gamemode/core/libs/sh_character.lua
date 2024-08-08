@@ -326,6 +326,7 @@ do
 		field = "name",
 		fieldType = ix.type.string,
 		default = "John Doe",
+		hint = "nameHint",
 		index = 1,
 		OnValidate = function(self, value, payload, client)
 			if (!value) then
@@ -361,6 +362,8 @@ do
 				panel:SetDisabled(true)
 				panel:SetEditable(false)
 			end
+
+			panel:SetTall(panel:GetTall() * 1.3)
 
 			panel:SetBackgroundColor(faction.color or Color(255, 255, 255, 25))
 		end
