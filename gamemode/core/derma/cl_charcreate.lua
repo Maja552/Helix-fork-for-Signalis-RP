@@ -5,6 +5,13 @@ local padding = ScreenScale(32)
 DEFINE_BASECLASS("ixCharMenuPanel")
 local PANEL = {}
 
+local descriptionPage = 1
+local classDescription = ''
+local classStats = nil
+local classDescriptionText = nil
+
+local nextPageTurn = 0
+
 function PANEL:Init()
 	local parent = self:GetParent()
 	local halfWidth = parent:GetWide() * 0.5 - (padding * 2)
@@ -17,8 +24,6 @@ function PANEL:Init()
 	self.factionButtons = {}
 	self.classButtons = {}
 	self.repopulatePanels = {}
-
-	self.stats = nil
 
 	-- faction selection subpanel
 	self.factionPanel = self:AddSubpanel("faction", true)
@@ -79,7 +84,6 @@ function PANEL:Init()
 	self.classPanel = self:AddSubpanel("class", true)
 	self.classPanel:SetTitle("chooseClass")
 	self.classPanel.OnSetActive = function()
-		self.stats = nil
 		-- if we only have one class, we are always selecting that one so we can skip to the description section
 		if (#self.classButtons == 1) then
 			self:SetActiveSubpanel("description", 0)
@@ -89,37 +93,104 @@ function PANEL:Init()
 	local modelClassList = self.classPanel:Add("Panel")
 	modelClassList:Dock(RIGHT)
 	modelClassList:SetSize(thirdWidth + padding * 2, halfHeight)
-	--modelClassList.Paint = function(self, w, h) draw.RoundedBox(0, 0, 0, w, h, Color(255,0,0)) end
 
-	local statsPanel = self.classPanel:Add("Panel")
-	statsPanel:Dock(RIGHT)
-	statsPanel:SetSize(thirdWidth + padding * 2, halfHeight)
+	local statsPanelWidth = thirdWidth + padding * 2
 
-	local spaceBetween = 38
-	statsPanel.Paint = function(self, w, h)
-		local stats = self:GetParent():GetParent().stats
-
+	self.statsPanel = self.classPanel:Add("Panel")
+	self.statsPanel:Dock(RIGHT)
+	self.statsPanel:SetWidth(statsPanelWidth)
+	self.statsPanel.spaceBetween = 38
+	self.statsPanel.statsY = 0
+	self.statsPanel.stats = nil
+	self.statsPanel:SetMouseInputEnabled(true)
+	self.statsPanel.SetParams = function(self, stats)
+		local stats = classStats
 		if stats then
-			local y = 100
-			draw.DrawText("Health: " .. stats.health, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Physical damage taken: " .. stats.physical_damage_taken, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Bullet damage taken: " .. stats.bullet_damage_taken, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Mental strength: " .. stats.mental_strength, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Hunger: " .. stats.hunger, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Thirst: " .. stats.thirst, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Speed: " .. stats.speed, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Jump power: " .. stats.jump_power, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
-			y = y + spaceBetween
-			draw.DrawText("Max stamina: " .. stats.max_stamina, "ixMenuButtonFontSmall", w * 0.5, y, color_white, TEXT_ALIGN_CENTER)
+			self.stats = {}
+			self.statsY = 0
+			for k,v in pairs(stats) do
+				local name = string.gsub(k, "_", " ")
+				name = string.upper(string.sub(name, 1, 1)) .. string.sub(name, 2)
+				self.stats[k] = {name = name, value = v, y = self.statsY}
+				self.statsY = self.statsY + self.spaceBetween
+			end
+			self.statsY = self.statsY + self.spaceBetween
 		end
-		--draw.RoundedBox(0, 0, 0, w, h, Color(0,0,255,10))
+
+		if classDescription and classDescription[descriptionPage] then
+			classDescriptionText:SetText(classDescription[descriptionPage])
+		end
+	end
+	self.statsPanel.Paint = function(self, w, h)
+		if self.stats then
+			for k,v in pairs(self.stats) do
+				draw.DrawText(v.name .. ": " .. v.value, "ixMenuButtonFontSmall", 8, v.y, color_white, TEXT_ALIGN_LEFT)
+			end
+		end
+	end
+
+	classDescriptionText = self.statsPanel:Add("DTextEntry")
+	classDescriptionText:SetMultiline(true)
+	classDescriptionText:SetEditable(false)
+	classDescriptionText:SetDisabled(true)
+	classDescriptionText:SetFont("ixMenuButtonFontSmall")
+	classDescriptionText:SetPaintBackground(false)
+	classDescriptionText:SetTextColor(color_white)
+	classDescriptionText:SetHeight(ScrH() * 0.4)
+	classDescriptionText:Dock(BOTTOM)
+	classDescriptionText:SetMouseInputEnabled(true)
+
+	local cDw, cDh = classDescriptionText:GetSize()
+	local buttonSize = 40
+
+	local pageLeftButton = classDescriptionText:Add("DButton")
+	pageLeftButton:SetText("")
+	pageLeftButton:SetPos(16, cDh - buttonSize)
+	pageLeftButton:SetSize(buttonSize, buttonSize)
+	pageLeftButton:SetMouseInputEnabled(true)
+	pageLeftButton.Paint = function(this, w, h)
+		if classDescription[descriptionPage - 1] then
+			draw.TextShadow({
+				text = "<",
+				font = "SignalisDocumentsFontBig",
+				pos = {w / 2, h / 2},
+				xalign = TEXT_ALIGN_CENTER,
+				yalign = TEXT_ALIGN_CENTER,
+				color = color_white
+			}, 1, 255)
+		end
+	end
+	pageLeftButton.DoClick = function()
+		if nextPageTurn < CurTime() and descriptionPage > 1 and classDescription[descriptionPage - 1] then
+			descriptionPage = descriptionPage - 1
+			classDescriptionText:SetText(classDescription[descriptionPage])
+			nextPageTurn = CurTime() + 0.3
+		end
+	end
+
+	local pageRightButton = classDescriptionText:Add("DButton")
+	pageRightButton:SetText("")
+	pageRightButton:SetPos(statsPanelWidth - buttonSize - 16, cDh - buttonSize)
+	pageRightButton:SetSize(buttonSize, buttonSize)
+	pageRightButton:SetMouseInputEnabled(true)
+	pageRightButton.Paint = function(this, w, h)
+		if classDescription[descriptionPage + 1] then
+			draw.TextShadow({
+				text = ">",
+				font = "SignalisDocumentsFontBig",
+				pos = {w / 2, h / 2},
+				xalign = TEXT_ALIGN_CENTER,
+				yalign = TEXT_ALIGN_CENTER,
+				color = color_white
+			}, 1, 255)
+		end
+	end
+	pageRightButton.DoClick = function()
+		if nextPageTurn < CurTime() and classDescription[descriptionPage + 1] then
+			descriptionPage = descriptionPage + 1
+			classDescriptionText:SetText(classDescription[descriptionPage])
+			nextPageTurn = CurTime() + 0.3
+		end
 	end
 
 	self.classProceed = modelClassList:Add("ixMenuButton")
@@ -460,7 +531,7 @@ function PANEL:populateClassButtons()
 				local class = ix.class.list[panel.class]
 				local models = class:GetModels(LocalPlayer())
 
-				self.stats = {
+				classStats = {
 					health = class.health,
 					physical_damage_taken = class.physical_damage_taken,
 					bullet_damage_taken = class.bullet_damage_taken,
@@ -471,6 +542,10 @@ function PANEL:populateClassButtons()
 					jump_power = class.jump_power,
 					max_stamina = class.max_stamina,
 				}
+
+				descriptionPage = 1
+				classDescription = class.description
+				self.statsPanel.SetParams(self.statsPanel, classStats)
 
 				self.payload:Set("class", panel.class)
 				self.payload:Set("model", math.random(1, #models))
