@@ -347,11 +347,11 @@ do
 				return false, "nameMaxLen", maxLength
 			end
 
-			return hook.Run("GetDefaultCharacterName", client, payload.faction) or value:utf8sub(1, 70)
+			return hook.Run("GetDefaultCharacterName", client, payload.faction, payload.class) or value:utf8sub(1, 70)
 		end,
 		OnPostSetup = function(self, panel, payload)
 			local faction = ix.faction.indices[payload.faction]
-			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload.faction)
+			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload.faction, payload.class)
 
 			if (name) then
 				panel:SetText(name)
