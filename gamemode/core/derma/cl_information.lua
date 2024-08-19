@@ -173,7 +173,11 @@ function PANEL:Init()
 					bar:SetValue(value)
 				end
 
-				local maximum = v.maxValue or ix.config.Get("maxAttributes", 100)
+				local maximum = ix.config.Get("maxAttributes", 100)
+
+				if v.maxValue then
+					maximum = v.maxValue
+				end
 				if isfunction(maximum) then
 					for k2, v2 in pairs(ix.class.list) do
 						if character.vars.class == v2.uniqueID then
