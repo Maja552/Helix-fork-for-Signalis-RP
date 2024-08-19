@@ -622,8 +622,6 @@ function PANEL:Populate(redo)
 
 		for _, v in SortedPairs(ix.faction.teams) do
 			if (ix.faction.HasWhitelist(v.index)) then
-				print("faction", _)
-
 				local num = 0
 				for _, v2 in SortedPairs(ix.class.list) do
 					if v2.faction == v.index && ix.class.HasClassWhitelist(v2.index) then
