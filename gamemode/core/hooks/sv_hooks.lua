@@ -98,6 +98,8 @@ function GM:PlayerInitialSpawn(client)
 		client:KillSilent()
 		client:StripAmmo()
 	end)
+
+	client:LoadQueuedWhitelists()
 end
 
 function GM:PlayerUse(client, entity)

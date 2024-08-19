@@ -111,6 +111,14 @@ function ix.db.LoadTables()
 		query:PrimaryKey("steamid")
 	query:Execute()
 
+	query = mysql:Create("ix_queued_whitelists")
+		query:Create("whitelist_id", "INT(11) UNSIGNED NOT NULL AUTO_INCREMENT")
+		query:Create("steamid", "VARCHAR(20) NOT NULL")
+		query:Create("type", "VARCHAR(8) NOT NULL")
+		query:Create("index", "INT(16) NOT NULL")
+		query:PrimaryKey("whitelist_id")
+	query:Execute()
+
 	-- populate schema table if rows don't exist
 	query = mysql:InsertIgnore("ix_schema")
 		query:Insert("table", "ix_characters")

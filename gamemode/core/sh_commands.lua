@@ -1,4 +1,20 @@
 
+local function isValidSteamid(steamid)
+	return string.match(steamid, "^STEAM_[01]:[01]:%d+$") ~= nil or string.match(steamid, "^7656119%d%d%d%d%d%d%d%d$") ~= nil
+end
+
+local function isEternalisPlayerVerified(steamid)
+    local jsonDB = file.Read("eternalis/auth/db.txt", "DATA")
+    if jsonDB then
+        local database = util.JSONToTable(jsonDB)
+        local playerData = database[steamid]
+        if playerData and playerData["whitelisted"] then
+            return true
+        end
+    end
+    return false
+end
+
 ix.command.Add("Roll", {
 	description = "@cmdRoll",
 	arguments = bit.bor(ix.type.number, ix.type.optional),
@@ -517,38 +533,78 @@ do
 	end)
 end
 
-ix.command.Add("PlyWhitelist", {
-	description = "@cmdPlyWhitelist",
+ix.command.Add("PlyWhitelistFaction", {
+	description = "@cmdPlyWhitelistFaction",
 	privilege = "Manage Character Whitelist",
 	superAdminOnly = true,
 	arguments = {
-		ix.type.player,
+		ix.type.string,
 		ix.type.text
 	},
 	OnRun = function(self, client, target, name)
+		if (target == "") then
+			return "@invalidArg", 1
+		end
 		if (name == "") then
 			return "@invalidArg", 2
 		end
 
 		local faction = ix.faction.teams[name]
-
 		if (!faction) then
 			for _, v in ipairs(ix.faction.indices) do
 				if (ix.util.StringMatches(L(v.name, client), name) or ix.util.StringMatches(v.uniqueID, name)) then
 					faction = v
-
 					break
 				end
 			end
 		end
 
 		if (faction) then
-			if (target:SetWhitelisted(faction.index, true)) then
+			local targetPlayer = ix.util.FindPlayer(target)
+
+			if (IsValid(targetPlayer) and targetPlayer:SetWhitelisted(faction.index, true)) then
 				for _, v in player.Iterator() do
-					if (self:OnCheckAccess(v) or v == target) then
-						v:NotifyLocalized("whitelist", client:GetName(), target:GetName(), L(faction.name, v))
+					if (self:OnCheckAccess(v) or v == targetPlayer) then
+						v:NotifyLocalized("whitelist", client:GetName(), targetPlayer:GetName(), L(faction.name, v))
 					end
 				end
+			else
+				if !isValidSteamid(target) then
+					return "@invalidSteamID"
+				end
+
+				if (target:sub(1, 5) == "STEAM") then
+					target = util.SteamIDTo64(target)
+				end
+
+				if !isEternalisPlayerVerified(steamid) then
+					return "@playedNotVerified"
+				end
+
+				local query = mysql:Select("ix_queued_whitelists")
+				query:Select("index")
+				query:Where("type", "faction")
+				query:Where("index", faction.index)
+				query:Where("steamid", target)
+				query:Limit(1)
+				query:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						return "@alreadyInWhitelist"
+					else
+						local insertQuery = mysql:Insert("ix_queued_whitelists")
+						insertQuery:Insert("steamid", target)
+						insertQuery:Insert("type", "faction")
+						insertQuery:Insert("index", faction.index)
+						insertQuery:Execute()
+
+						for _, v in player.Iterator() do
+							if (self:OnCheckAccess(v)) then
+								v:NotifyLocalized("whitelist", client:GetName(), target, L(faction.name, v))
+							end
+						end
+					end
+				end)
+				query:Execute()
 			end
 		else
 			return "@invalidFaction"
@@ -561,33 +617,73 @@ ix.command.Add("PlyWhitelistClass", {
 	privilege = "Manage Class Whitelist",
 	superAdminOnly = true,
 	arguments = {
-		ix.type.player,
+		ix.type.string,
 		ix.type.text
 	},
 	OnRun = function(self, client, target, name)
+		if (target == "") then
+			return "@invalidArg", 1
+		end
 		if (name == "") then
 			return "@invalidArg", 2
 		end
 
 		local class = ix.class.list[name]
-
 		if (!class) then
 			for _, v in ipairs(ix.class.list) do
 				if (ix.util.StringMatches(L(v.name, client), name) or ix.util.StringMatches(v.uniqueID, name)) then
 					class = v
-
 					break
 				end
 			end
 		end
 
 		if (class) then
-			if (target:SetClassWhitelisted(class.index, true)) then
+			local targetPlayer = ix.util.FindPlayer(target)
+
+			if (IsValid(targetPlayer) and targetPlayer:SetClassWhitelisted(class.index, true)) then
 				for _, v in ipairs(player.GetAll()) do
-					if (self:OnCheckAccess(v) or v == target) then
-						v:NotifyLocalized("class_whitelist", client:GetName(), target:GetName(), L(class.name, v))
+					if (self:OnCheckAccess(v) or v == targetPlayer) then
+						v:NotifyLocalized("class_whitelist", client:GetName(), targetPlayer:GetName(), L(class.name, v))
 					end
 				end
+			else
+				if !isValidSteamid(target) then
+					return "@invalidSteamID"
+				end
+
+				if (target:sub(1, 5) == "STEAM") then
+					target = util.SteamIDTo64(target)
+				end
+
+				if !isEternalisPlayerVerified(steamid) then
+					return "@playedNotVerified"
+				end
+
+				local query = mysql:Select("ix_queued_whitelists")
+				query:Select("index")
+				query:Where("index", class.index)
+				query:Where("type", "class")
+				query:Where("steamid", target)
+				query:Limit(1)
+				query:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						return "@alreadyInWhitelist"
+					else
+						local insertQuery = mysql:Insert("ix_queued_whitelists")
+						insertQuery:Insert("steamid", target)
+						insertQuery:Insert("type", "class")
+						insertQuery:Insert("index", class.index)
+						insertQuery:Execute()
+
+						for _, v in player.Iterator() do
+							if (self:OnCheckAccess(v)) then
+								v:NotifyLocalized("class_whitelist", client:GetName(), target, L(class.name, v))
+							end
+						end
+					end
+				end)
+				query:Execute()
 			end
 		else
 			return "@invalidClass"
@@ -619,8 +715,8 @@ ix.command.Add("CharGetUp", {
 	end
 })
 
-ix.command.Add("PlyUnwhitelist", {
-	description = "@cmdPlyUnwhitelist",
+ix.command.Add("PlyUnwhitelistFaction", {
+	description = "@cmdPlyUnwhitelistFaction",
 	privilege = "Manage Character Whitelist",
 	superAdminOnly = true,
 	arguments = {
@@ -710,7 +806,7 @@ ix.command.Add("PlyUnwhitelistClass", {
 		if (class) then
 			local targetPlayer = ix.util.FindPlayer(target)
 
-			if (IsValid(targetPlayer) and targetPlayer:SetWhitelisted(class.index, false)) then
+			if (IsValid(targetPlayer) and targetPlayer:SetClassWhitelisted(class.index, false)) then
 				for _, v in ipairs(player.GetAll()) do
 					if (self:OnCheckAccess(v) or v == targetPlayer) then
 						v:NotifyLocalized("class_unwhitelist", client:GetName(), targetPlayer:GetName(), L(class.name, v))

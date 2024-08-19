@@ -5,6 +5,31 @@ do
 	util.AddNetworkString("ixData")
 	util.AddNetworkString("ixDataSync")
 
+	function playerMeta:LoadQueuedWhitelists()
+		local queryWhitelist = mysql:Select("ix_queued_whitelists")
+		queryWhitelist:Select("index")
+		queryWhitelist:Select("type")
+		queryWhitelist:Where("steamid", self:SteamID64())
+		queryWhitelist:Callback(function(result)
+			if (IsValid(self) and istable(result) and #result > 0) then
+				for k,v in pairs(result) do
+					if (v.index and v.type) then
+						if v.type == "faction" then
+							self:SetWhitelisted(tonumber(v.index), true)
+						elseif v.type == "class" then
+							self:SetClassWhitelisted(tonumber(v.index), true)
+						end
+
+						local deleteQuery = mysql:Delete("ix_queued_whitelists")
+						deleteQuery:Where("index", class)
+						deleteQuery:Execute()
+					end
+				end
+			end
+		end)
+		queryWhitelist:Execute()
+	end
+
 	function playerMeta:LoadData(callback)
 		local name = self:SteamName()
 		local steamID64 = self:SteamID64()
