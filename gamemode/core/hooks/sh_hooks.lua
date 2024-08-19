@@ -194,26 +194,28 @@ function GM:DoAnimationEvent(client, event, data)
 		if (IsValid(weapon)) then
 			local animation = client.ixAnimTable
 
-			if (event == PLAYERANIMEVENT_ATTACK_PRIMARY) then
-				client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.attack or ACT_GESTURE_RANGE_ATTACK_SMG1, true)
+			if animation then
+				if (event == PLAYERANIMEVENT_ATTACK_PRIMARY) then
+					client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.attack or ACT_GESTURE_RANGE_ATTACK_SMG1, true)
 
-				return ACT_VM_PRIMARYATTACK
-			elseif (event == PLAYERANIMEVENT_ATTACK_SECONDARY) then
-				client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.attack or ACT_GESTURE_RANGE_ATTACK_SMG1, true)
+					return ACT_VM_PRIMARYATTACK
+				elseif (event == PLAYERANIMEVENT_ATTACK_SECONDARY) then
+					client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.attack or ACT_GESTURE_RANGE_ATTACK_SMG1, true)
 
-				return ACT_VM_SECONDARYATTACK
-			elseif (event == PLAYERANIMEVENT_RELOAD) then
-				client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.reload or ACT_GESTURE_RELOAD_SMG1, true)
+					return ACT_VM_SECONDARYATTACK
+				elseif (event == PLAYERANIMEVENT_RELOAD) then
+					client:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, animation.reload or ACT_GESTURE_RELOAD_SMG1, true)
 
-				return ACT_INVALID
-			elseif (event == PLAYERANIMEVENT_JUMP) then
-				client:AnimRestartMainSequence()
+					return ACT_INVALID
+				elseif (event == PLAYERANIMEVENT_JUMP) then
+					client:AnimRestartMainSequence()
 
-				return ACT_INVALID
-			elseif (event == PLAYERANIMEVENT_CANCEL_RELOAD) then
-				client:AnimResetGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD)
+					return ACT_INVALID
+				elseif (event == PLAYERANIMEVENT_CANCEL_RELOAD) then
+					client:AnimResetGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD)
 
-				return ACT_INVALID
+					return ACT_INVALID
+				end
 			end
 		end
 	end
