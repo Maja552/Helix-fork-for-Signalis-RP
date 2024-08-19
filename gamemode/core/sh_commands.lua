@@ -1,12 +1,12 @@
 
 local function isValidSteamid(steamid)
-	return string.match(steamid, "^STEAM_[01]:[01]:%d+$") ~= nil or string.match(steamid, "^7656119%d%d%d%d%d%d%d%d$") ~= nil
+	return string.match(steamid, "^STEAM_[01]:[01]:%d+$") ~= nil or string.match(steamid, "^7656119%d%d%d%d%d%d%d%d%d%d%d$") ~= nil
 end
 
-local function isEternalisPlayerVerified(steamid)
+function isEternalisPlayerVerified(steamid)
     local jsonDB = file.Read("eternalis/auth/db.txt", "DATA")
     if jsonDB then
-        local database = util.JSONToTable(jsonDB)
+        local database = util.JSONToTable(jsonDB, false, true)
         local playerData = database[steamid]
         if playerData and playerData["whitelisted"] then
             return true
@@ -14,6 +14,7 @@ local function isEternalisPlayerVerified(steamid)
     end
     return false
 end
+
 
 ix.command.Add("Roll", {
 	description = "@cmdRoll",
