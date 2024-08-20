@@ -541,19 +541,13 @@ function SKIN:PaintDeathScreen(panel, width, height, progress)
 end
 
 do
-	-- check if sounds exist, otherwise fall back to default UI sounds
-	local bWhoosh = file.Exists("sound/helix/ui/whoosh1.wav", "GAME")
-	local bRollover = file.Exists("sound/eternalis/signalis_ui/select.wav", "GAME")
-	local bPress = file.Exists("sound/eternalis/signalis_ui/confirm.wav", "GAME")
-	local bNotify = file.Exists("sound/helix/ui/REPLACEME.wav", "GAME") -- @todo
-
 	sound.Add({
 		name = "Helix.Whoosh",
 		channel = CHAN_STATIC,
 		volume = 0.4,
 		level = 80,
-		pitch = bWhoosh and {90, 105} or 100,
-		sound = bWhoosh and {
+		pitch = 100,
+		sound = {
 			"helix/ui/whoosh1.wav",
 			"helix/ui/whoosh2.wav",
 			"helix/ui/whoosh3.wav",
@@ -568,8 +562,8 @@ do
 		channel = CHAN_STATIC,
 		volume = 0.5,
 		level = 80,
-		pitch = {95, 105},
-		sound = bRollover and "eternalis/signalis_ui/select.wav" or "ui/buttonrollover.wav"
+		pitch = 100,
+		sound = "eternalis/signalis_ui/select.wav"
 	})
 
 	sound.Add({
@@ -577,8 +571,8 @@ do
 		channel = CHAN_STATIC,
 		volume = 0.5,
 		level = 80,
-		pitch = bPress and {95, 110} or 100,
-		sound = bPress and "eternalis/signalis_ui/confirm.wav" or "ui/buttonclickrelease.wav"
+		pitch = 100,
+		sound = "eternalis/signalis_ui/confirm.wav"
 	})
 
 	sound.Add({
@@ -587,7 +581,7 @@ do
 		volume = 0.35,
 		level = 80,
 		pitch = 140,
-		sound = bNotify and "helix/ui/REPLACEME.wav" or "weapons/grenade/tick1.wav"
+		sound = "weapons/grenade/tick1.wav"
 	})
 end
 
