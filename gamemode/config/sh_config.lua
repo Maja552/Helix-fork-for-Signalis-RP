@@ -116,7 +116,7 @@ end, {
 	category = "characters"
 })
 
-ix.config.Add("runSpeed", 235, "How fast a player normally runs.", function(oldValue, newValue)
+ix.config.Add("runSpeed", 225, "How fast a player normally runs.", function(oldValue, newValue)
 	for _, v in ipairs(player.GetAll())	do
 		local character = v:GetCharacter()
 		local speed_mul = 1
@@ -134,7 +134,7 @@ end, {
 	category = "characters"
 })
 
-ix.config.Add("jumpPower", 160, "How high a player can jump.", function(oldValue, newValue)
+ix.config.Add("jumpPower", 155, "How high a player can jump.", function(oldValue, newValue)
 	for _, v in ipairs(player.GetAll())	do
 		local character = v:GetCharacter()
 		local mul = 1
