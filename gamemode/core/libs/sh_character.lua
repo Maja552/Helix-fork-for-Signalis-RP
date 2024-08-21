@@ -302,6 +302,39 @@ function ix.char.New(data, id, client, steamID)
 	return character
 end
 
+if SERVER then
+	util.AddNetworkString("getDefaultCharacterName")
+
+	net.Receive("getDefaultCharacterName", function(len, ply)
+		local faction = net.ReadString()
+		local class = net.ReadString()
+
+		local name, disabled = hook.Run("GetDefaultCharacterName", ply, faction, class)
+		if name then
+			net.Start("getDefaultCharacterName")
+				net.WriteString(name)
+				net.WriteBool(disabled)
+			net.Send(ply)
+		end
+	end)
+else
+	lastNamePanel = nil
+	lastPayload = nil
+
+	net.Receive("getDefaultCharacterName", function(len)
+		local name = net.ReadString()
+		local disabled = net.ReadBool()
+		if lastNamePanel then
+			lastNamePanel:SetText(name)
+			lastPayload:Set("name", name)
+			if disabled then
+				lastNamePanel:SetDisabled(true)
+				lastNamePanel:SetEditable(false)
+			end
+		end
+	end)
+end
+
 ix.char.varHooks = ix.char.varHooks or {}
 function ix.char.HookVar(varName, hookName, func)
 	ix.char.varHooks[varName] = ix.char.varHooks[varName] or {}
@@ -341,8 +374,10 @@ do
 
 			if (value:utf8len() < minLength) then
 				return false, "nameMinLen", minLength
+
 			elseif (!value:find("%S")) then
 				return false, "invalid", "name"
+
 			elseif (value:gsub("%s", ""):utf8len() > maxLength) then
 				return false, "nameMaxLen", maxLength
 			end
@@ -364,8 +399,16 @@ do
 			end
 
 			panel:SetTall(panel:GetTall() * 1.3)
-
 			panel:SetBackgroundColor(faction.color or Color(255, 255, 255, 25))
+
+			if CLIENT then
+				lastNamePanel = panel
+				lastPayload = payload
+				net.Start("getDefaultCharacterName")
+					net.WriteString(payload.faction)
+					net.WriteString(payload.class)
+				net.SendToServer()
+			end
 		end
 	})
 
