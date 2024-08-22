@@ -382,11 +382,17 @@ do
 				return false, "nameMaxLen", maxLength
 			end
 
-			return hook.Run("GetDefaultCharacterName", client, payload.faction, payload.class) or value:utf8sub(1, 70)
+			for _, char in pairs(ix.char.loaded) do
+				if char.vars.name == value then
+					return false, "nameInUse"
+				end
+			end
+
+			return hook.Run("GetDefaultCharacterName", client, payload.faction, payload.class, value) or value:utf8sub(1, 70)
 		end,
 		OnPostSetup = function(self, panel, payload)
 			local faction = ix.faction.indices[payload.faction]
-			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload.faction, payload.class)
+			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload.faction, payload.class, nil)
 
 			if (name) then
 				panel:SetText(name)
@@ -402,12 +408,14 @@ do
 			panel:SetBackgroundColor(faction.color or Color(255, 255, 255, 25))
 
 			if CLIENT then
-				lastNamePanel = panel
-				lastPayload = payload
-				net.Start("getDefaultCharacterName")
-					net.WriteString(payload.faction)
-					net.WriteString(payload.class)
-				net.SendToServer()
+				if payload.faction and payload.class then
+					lastNamePanel = panel
+					lastPayload = payload
+					net.Start("getDefaultCharacterName")
+						net.WriteString(payload.faction)
+						net.WriteString(payload.class)
+					net.SendToServer()
+				end
 			end
 		end
 	})

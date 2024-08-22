@@ -470,4 +470,5 @@ LANGUAGE = {
 	class_unwhitelist = "%s has unwhitelisted %s from the %s class.",
 	playedNotVerified = "This player has not been verified yet.",
 	invalidSteamID = "Invalid SteamID.",
+	nameInUse = "This name is already in use.",
 }
