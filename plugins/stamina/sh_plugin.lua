@@ -3,7 +3,7 @@ PLUGIN.author = "Chessnut"
 PLUGIN.description = "Adds a stamina system to limit running."
 
 -- luacheck: push ignore 631
-ix.config.Add("staminaDrain", 1, "How much stamina to drain per tick (every quarter second). This is calculated before attribute reduction.", nil, {
+ix.config.Add("staminaDrain", 2, "How much stamina to drain per tick (every quarter second). This is calculated before attribute reduction.", nil, {
 	data = {min = 0, max = 10, decimals = 2},
 	category = "characters"
 })
