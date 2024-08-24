@@ -9,6 +9,7 @@ ix.util.Include("helix/gamemode/core/meta/sh_tool.lua")
 HOOKS_CACHE = {}
 
 function ix.plugin.Load(uniqueID, path, isSingleFile, variable)
+	if string.find(path, "_disabled") then return end
 	if (hook.Run("PluginShouldLoad", uniqueID) == false) then return end
 
 	variable = variable or "PLUGIN"
