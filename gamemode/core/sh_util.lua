@@ -249,6 +249,10 @@ function ix.util.FindPlayer(identifier, bAllowPatterns)
 		return player.GetBySteamID(identifier)
 	end
 
+	if string.find(identifier, "7656119") then
+		return player.GetBySteamID64(identifier)
+	end
+
 	if (!bAllowPatterns) then
 		identifier = string.PatternSafe(identifier)
 	end
