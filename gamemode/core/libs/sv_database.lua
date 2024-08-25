@@ -143,6 +143,8 @@ function ix.db.LoadTables()
 			end
 		end)
 	query:Execute()
+
+	hook.Run("OnLoadDatabaseTables")
 end
 
 function ix.db.WipeTables(callback)
