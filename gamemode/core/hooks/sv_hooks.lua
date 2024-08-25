@@ -100,6 +100,8 @@ function GM:PlayerInitialSpawn(client)
 	end)
 
 	client:LoadQueuedWhitelists()
+
+	hook.Run("PostPlayerInitialized", client)
 end
 
 function GM:PlayerUse(client, entity)
