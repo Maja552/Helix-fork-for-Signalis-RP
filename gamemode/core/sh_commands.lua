@@ -598,6 +598,8 @@ ix.command.Add("PlyWhitelistFaction", {
 						insertQuery:Insert("index", faction.index)
 						insertQuery:Execute()
 
+						print("whitelisted faction for", target, faction.index)
+
 						for _, v in player.Iterator() do
 							if (self:OnCheckAccess(v)) then
 								v:NotifyLocalized("whitelist", client:GetName(), target, L(faction.name, v))
@@ -676,6 +678,8 @@ ix.command.Add("PlyWhitelistClass", {
 						insertQuery:Insert("type", "class")
 						insertQuery:Insert("index", class.index)
 						insertQuery:Execute()
+
+						print("whitelisted class for", target, class.index)
 
 						for _, v in player.Iterator() do
 							if (self:OnCheckAccess(v)) then
