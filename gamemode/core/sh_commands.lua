@@ -590,15 +590,14 @@ ix.command.Add("PlyWhitelistFaction", {
 				query:Limit(1)
 				query:Callback(function(result)
 					if (istable(result) and #result > 0) then
-						return "@alreadyInWhitelist"
+						client:NotifyLocalized("alreadyInWhitelist")
+						return
 					else
 						local insertQuery = mysql:Insert("ix_queued_whitelists")
 						insertQuery:Insert("steamid", target)
 						insertQuery:Insert("type", "faction")
 						insertQuery:Insert("index", faction.index)
 						insertQuery:Execute()
-
-						print("whitelisted faction for", target, faction.index)
 
 						for _, v in player.Iterator() do
 							if (self:OnCheckAccess(v)) then
@@ -671,15 +670,14 @@ ix.command.Add("PlyWhitelistClass", {
 				query:Limit(1)
 				query:Callback(function(result)
 					if (istable(result) and #result > 0) then
-						return "@alreadyInWhitelist"
+						client:NotifyLocalized("alreadyInWhitelist")
+						return
 					else
 						local insertQuery = mysql:Insert("ix_queued_whitelists")
 						insertQuery:Insert("steamid", target)
 						insertQuery:Insert("type", "class")
 						insertQuery:Insert("index", class.index)
 						insertQuery:Execute()
-
-						print("whitelisted class for", target, class.index)
 
 						for _, v in player.Iterator() do
 							if (self:OnCheckAccess(v)) then
