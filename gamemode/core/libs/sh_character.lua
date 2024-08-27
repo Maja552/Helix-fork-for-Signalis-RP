@@ -302,39 +302,6 @@ function ix.char.New(data, id, client, steamID)
 	return character
 end
 
-if SERVER then
-	util.AddNetworkString("getDefaultCharacterName")
-
-	net.Receive("getDefaultCharacterName", function(len, ply)
-		local faction = net.ReadString()
-		local class = net.ReadString()
-
-		local name, disabled = hook.Run("GetDefaultCharacterName", ply, faction, class)
-		if name then
-			net.Start("getDefaultCharacterName")
-				net.WriteString(name)
-				net.WriteBool(disabled)
-			net.Send(ply)
-		end
-	end)
-else
-	lastNamePanel = nil
-	lastPayload = nil
-
-	net.Receive("getDefaultCharacterName", function(len)
-		local name = net.ReadString()
-		local disabled = net.ReadBool()
-		if lastNamePanel then
-			lastNamePanel:SetText(name)
-			lastPayload:Set("name", name)
-			if disabled then
-				lastNamePanel:SetDisabled(true)
-				lastNamePanel:SetEditable(false)
-			end
-		end
-	end)
-end
-
 ix.char.varHooks = ix.char.varHooks or {}
 function ix.char.HookVar(varName, hookName, func)
 	ix.char.varHooks[varName] = ix.char.varHooks[varName] or {}
@@ -388,11 +355,11 @@ do
 				end
 			end
 
-			return hook.Run("GetDefaultCharacterName", client, payload.faction, payload.class, value) or value:utf8sub(1, 70)
+			return hook.Run("GetDefaultCharacterName", client, payload, value) or value:utf8sub(1, 70)
 		end,
 		OnPostSetup = function(self, panel, payload)
 			local faction = ix.faction.indices[payload.faction]
-			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload.faction, payload.class, nil)
+			local name, disabled = hook.Run("GetDefaultCharacterName", LocalPlayer(), payload, nil, panel)
 
 			if (name) then
 				panel:SetText(name)
@@ -406,17 +373,6 @@ do
 
 			panel:SetTall(panel:GetTall() * 1.3)
 			panel:SetBackgroundColor(faction.color or Color(255, 255, 255, 25))
-
-			if CLIENT then
-				if payload.faction and payload.class then
-					lastNamePanel = panel
-					lastPayload = payload
-					net.Start("getDefaultCharacterName")
-						net.WriteString(payload.faction)
-						net.WriteString(payload.class)
-					net.SendToServer()
-				end
-			end
 		end
 	})
 
