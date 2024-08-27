@@ -420,11 +420,17 @@ function GM:OnCharacterCreated(client, character)
 	end
 end
 
-function GM:GetDefaultCharacterName(client, faction)
-	local info = ix.faction.indices[faction]
+function GM:GetDefaultCharacterName(client, payload, value, panel)
+	local infoClass = ix.class.list[payload.class]
 
-	if (info and info.GetDefaultName) then
-		return info:GetDefaultName(client)
+	if (infoClass and infoClass.GetDefaultName) then
+		return infoClass:GetDefaultName(client)
+	end
+
+	local infoFaction = ix.faction.indices[payload.faction]
+
+	if (infoFaction and infoFaction.GetDefaultName) then
+		return infoFaction:GetDefaultName(client)
 	end
 end
 

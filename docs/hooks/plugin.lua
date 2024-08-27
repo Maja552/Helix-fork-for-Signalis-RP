@@ -464,7 +464,7 @@ function GetDefaultAttributePoints(client, count)
 end
 
 --- @realm shared
-function GetDefaultCharacterName(client, faction)
+function GetDefaultCharacterName(client, payload, value, panel)
 end
 
 --- @realm shared
