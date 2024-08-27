@@ -50,7 +50,7 @@ ix.config.Add("chatRange", 280, "The maximum distance a person's IC chat message
 	data = {min = 10, max = 5000, decimals = 1},
 	category = "chat"
 })
-ix.config.Add("chatMax", 256, "The maximum amount of characters that can be sent in chat.", nil, {
+ix.config.Add("chatMax", 600, "The maximum amount of characters that can be sent in chat.", nil, {
 	data = {min = 32, max = 1024},
 	category = "chat"
 })
