@@ -381,8 +381,8 @@ do
 		field = "pitch",
 		fieldType = ix.type.number,
 		default = 100,
-		min = 80,
-		max = 120,
+		min = 90,
+		max = 110,
 		index = 2,
 		OnValidate = function(self, value, payload)
 			if (!value) then
