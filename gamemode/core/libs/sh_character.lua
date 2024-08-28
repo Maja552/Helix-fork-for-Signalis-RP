@@ -376,6 +376,36 @@ do
 		end
 	})
 
+	--pitch
+	ix.char.RegisterVar("pitch", {
+		field = "pitch",
+		fieldType = ix.type.number,
+		default = 100,
+		min = 80,
+		max = 120,
+		index = 2,
+		OnValidate = function(self, value, payload)
+			if (!value) then
+				return false, "invalid", "pitch"
+			end
+
+			value = tonumber(value)
+
+			if (value < 80 or value > 120) then
+				return false, "invalid", "pitch"
+			end
+
+			return value
+		end,
+		OnPostSetup = function(self, panel, payload)
+		end,
+		ShouldDisplay = function(self, container, payload)
+			return payload["faction"] == FACTION_GESTALT
+		end,
+		alias = "Desc"
+	})
+
+
 	--- Sets this character's physical description. This is automatically networked.
 	-- @realm server
 	-- @string description New description for this character
@@ -389,7 +419,7 @@ do
 		field = "description",
 		fieldType = ix.type.text,
 		default = "",
-		index = 2,
+		index = 3,
 		OnValidate = function(self, value, payload)
 			value = string.Trim((tostring(value):gsub("\r\n", ""):gsub("\n", "")))
 			local minLength = ix.config.Get("minDescriptionLength", 16)
@@ -429,7 +459,7 @@ do
 		field = "model",
 		fieldType = ix.type.string,
 		default = "models/error.mdl",
-		index = 3,
+		index = 4,
 		OnSet = function(character, value)
 			local client = character:GetPlayer()
 

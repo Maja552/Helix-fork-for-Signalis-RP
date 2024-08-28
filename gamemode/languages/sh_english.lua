@@ -471,4 +471,5 @@ LANGUAGE = {
 	playedNotVerified = "This player has not been verified yet.",
 	invalidSteamID = "Invalid SteamID.",
 	nameInUse = "This name is already in use.",
+	pitch = "Voice pitch",
 }
