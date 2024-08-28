@@ -472,4 +472,5 @@ LANGUAGE = {
 	invalidSteamID = "Invalid SteamID.",
 	nameInUse = "This name is already in use.",
 	pitch = "Voice pitch",
+	protektorWhitelist = "That user already has a protektor whitelist.",
 }

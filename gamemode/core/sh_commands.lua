@@ -16,6 +16,116 @@ local function isEternalisPlayerVerified(steamid)
     return false
 end
 
+function WhitelistPlayer(this, client, targetPlayer, class)
+	if targetPlayer:SetClassWhitelisted(class.index, true) then
+		for _, v in ipairs(player.GetAll()) do
+			if (this:OnCheckAccess(v) or v == targetPlayer) then
+				v:NotifyLocalized("class_whitelist", client:GetName(), targetPlayer:GetName(), L(class.name, v))
+			end
+		end
+	end
+end
+
+-- lua_run checkProtektorWhitelists(Entity(1), "replika_arar")
+function checkProtektorWhitelists(this, client, targetPlayer, class)
+	local steamID64 = targetPlayer:SteamID64()
+
+	local query = mysql:Select("ix_players")
+	query:Select("data")
+	query:Where("steamid", steamID64)
+	query:Limit(1)
+	query:Callback(function(result)
+		if (istable(result) and #result > 0) then
+			local data = util.JSONToTable(result[1].data or "[]")
+			local class_whitelists = data.class_whitelists and data.class_whitelists[Schema.folder]
+
+			if class_whitelists and (class_whitelists["replika_stcr"] or class_whitelists["replika_star"] or class_whitelists["replika_klbr"]) then
+				client:NotifyLocalized("protektorWhitelist")
+				return
+			end
+			WhitelistPlayer(this, client, targetPlayer, class)
+		end
+	end)
+	query:Execute()
+end
+
+-- lua_run checkProtektorWhitelistsSteamid("76561198041940108", "replika_arar")
+function checkProtektorWhitelistsSteamid(this, client, steamId, class)
+	local query = mysql:Select("ix_players")
+	query:Select("data")
+	query:Where("steamid", steamId)
+	query:Limit(1)
+	query:Callback(function(result)
+		if (istable(result) and #result > 0) then
+			local data = util.JSONToTable(result[1].data or "[]")
+			local class_whitelists = data.class_whitelists and data.class_whitelists[Schema.folder]
+
+			if class_whitelists then
+				if class_whitelists["replika_stcr"] or class_whitelists["replika_star"] or class_whitelists["replika_klbr"] then
+					client:NotifyLocalized("protektorWhitelist")
+					return
+				end
+			end
+			WhitelistSteamid(this, client, steamId, class)
+		else
+			-- player hasnt been initialized yet but we have to check the queued whitelists
+			local query = mysql:Select("ix_queued_whitelists")
+			query:Select("index")
+			query:Where("type", "class")
+			query:Where("steamid", steamId)
+			query:Callback(function(result)
+				if (istable(result) and #result > 0) then
+					local numOfProtektors = 0
+					for k,v in pairs(result) do
+						if tonumber(v.index) == CLASS_REPLIKA_STCR
+						or tonumber(v.index) == CLASS_REPLIKA_STAR
+						or tonumber(v.index) == CLASS_REPLIKA_KLBR then
+							numOfProtektors = numOfProtektors + 1
+						end
+					end
+
+					if numOfProtektors > 0 then
+						client:NotifyLocalized("protektorWhitelist")
+						return
+					end
+				end
+
+				WhitelistSteamid(this, client, steamId, class)
+			end)
+			query:Execute()
+		end
+	end)
+	query:Execute()
+end
+
+function WhitelistSteamid(this, client, steamId, class)
+	local query = mysql:Select("ix_queued_whitelists")
+	query:Select("index")
+	query:Where("index", class.index)
+	query:Where("type", "class")
+	query:Where("steamid", steamId)
+	query:Limit(1)
+	query:Callback(function(result)
+		if (istable(result) and #result > 0) then
+			client:NotifyLocalized("alreadyInWhitelist")
+			return
+		else
+			local insertQuery = mysql:Insert("ix_queued_whitelists")
+			insertQuery:Insert("steamid", steamId)
+			insertQuery:Insert("type", "class")
+			insertQuery:Insert("index", class.index)
+			insertQuery:Execute()
+
+			for _, v in player.Iterator() do
+				if (this:OnCheckAccess(v)) then
+					v:NotifyLocalized("class_whitelist", client:GetName(), steamId, L(class.name, v))
+				end
+			end
+		end
+	end)
+	query:Execute()
+end
+
 ix.command.Add("Roll", {
 	description = "@cmdRoll",
 	arguments = bit.bor(ix.type.number, ix.type.optional),
@@ -643,12 +753,8 @@ ix.command.Add("PlyWhitelistClass", {
 		if (class) then
 			local targetPlayer = ix.util.FindPlayer(target)
 
-			if (IsValid(targetPlayer) and targetPlayer:SetClassWhitelisted(class.index, true)) then
-				for _, v in ipairs(player.GetAll()) do
-					if (self:OnCheckAccess(v) or v == targetPlayer) then
-						v:NotifyLocalized("class_whitelist", client:GetName(), targetPlayer:GetName(), L(class.name, v))
-					end
-				end
+			if IsValid(targetPlayer) then
+				checkProtektorWhitelists(self, client, targetPlayer, class)
 			else
 				if !isValidSteamid(target) then
 					return "@invalidSteamID"
@@ -659,34 +765,10 @@ ix.command.Add("PlyWhitelistClass", {
 				end
 
 				if !isEternalisPlayerVerified(target) then
-					return "@playedNotVerified"
+					--return "@playedNotVerified"
 				end
 
-				local query = mysql:Select("ix_queued_whitelists")
-				query:Select("index")
-				query:Where("index", class.index)
-				query:Where("type", "class")
-				query:Where("steamid", target)
-				query:Limit(1)
-				query:Callback(function(result)
-					if (istable(result) and #result > 0) then
-						client:NotifyLocalized("alreadyInWhitelist")
-						return
-					else
-						local insertQuery = mysql:Insert("ix_queued_whitelists")
-						insertQuery:Insert("steamid", target)
-						insertQuery:Insert("type", "class")
-						insertQuery:Insert("index", class.index)
-						insertQuery:Execute()
-
-						for _, v in player.Iterator() do
-							if (self:OnCheckAccess(v)) then
-								v:NotifyLocalized("class_whitelist", client:GetName(), target, L(class.name, v))
-							end
-						end
-					end
-				end)
-				query:Execute()
+				checkProtektorWhitelistsSteamid(self, client, targetPlayer, class)
 			end
 		else
 			return "@invalidClass"
