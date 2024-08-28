@@ -598,7 +598,7 @@ do
 					if model.bodygroups then
 						for i = 1, #model.bodygroups do
 							bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
-							print("bodygroup nr. "..i .. " = " .. bodygroups[i - 1])
+							--print("bodygroup nr. "..i .. " = " .. bodygroups[i - 1])
 						end
 					end
 
