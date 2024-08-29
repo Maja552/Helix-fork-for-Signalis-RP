@@ -28,8 +28,12 @@ end
 
 -- lua_run checkProtektorWhitelists(Entity(1), "replika_arar")
 function checkProtektorWhitelists(this, client, targetPlayer, class)
-	local steamID64 = targetPlayer:SteamID64()
+	if class.isProtektor == false then
+		WhitelistPlayer(this, client, targetPlayer, class)
+		return
+	end
 
+	local steamID64 = targetPlayer:SteamID64()
 	local query = mysql:Select("ix_players")
 	query:Select("data")
 	query:Where("steamid", steamID64)
@@ -51,6 +55,11 @@ end
 
 -- lua_run checkProtektorWhitelistsSteamid("76561198041940108", "replika_arar")
 function checkProtektorWhitelistsSteamid(this, client, steamId, class)
+	if class.isProtektor == false then
+		WhitelistSteamid(this, client, steamId, class)
+		return
+	end
+
 	local query = mysql:Select("ix_players")
 	query:Select("data")
 	query:Where("steamid", steamId)
