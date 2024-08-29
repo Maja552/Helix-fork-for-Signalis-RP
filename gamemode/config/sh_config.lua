@@ -152,15 +152,15 @@ end, {
 	category = "characters"
 })
 
-ix.config.Add("ladderClimbSpeed", 70, "How fast a player climbs the ladder.", function(oldValue, newValue)
+ix.config.Add("ladderClimbSpeed", 80, "How fast a player climbs the ladder.", function(oldValue, newValue)
 	for _, v in ipairs(player.GetAll())	do
 		local character = v:GetCharacter()
 		local mul = 1
 		if character then
 			local class = ix.class.GetClass(character.vars.class)
 
-			if (class and class.speed) then
-				mul = class.speed
+			if (class and class.ladder_speed) then
+				mul = class.ladder_speed
 			end
 		end
 		v:SetLadderClimbSpeed(math.Round(newValue * mul))
