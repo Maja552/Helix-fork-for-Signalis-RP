@@ -523,6 +523,11 @@ function GM:PlayerLoadout(client)
 			speed_mul = class.speed
 		end
 
+		local ladder_speed_mul = 1
+		if (class and class.ladder_speed) then
+			ladder_speed_mul = class.ladder_speed
+		end
+
 		local jump_mul = 1
 		if (class and class.jump_power) then
 			jump_mul = class.jump_power
@@ -550,7 +555,7 @@ function GM:PlayerLoadout(client)
 		end
 		*/
 		
-		client:SetLadderClimbSpeed(math.Round(ix.config.Get("ladderClimbSpeed") * speed_mul))
+		client:SetLadderClimbSpeed(math.Round(ix.config.Get("ladderClimbSpeed") * ladder_speed_mul))
 		client:SetWalkSpeed(math.Round(ix.config.Get("walkSpeed") * speed_mul))
 		client:SetRunSpeed(math.Round(ix.config.Get("runSpeed") * speed_mul))
 		client:SetJumpPower(math.Round(ix.config.Get("jumpPower") * jump_mul))
