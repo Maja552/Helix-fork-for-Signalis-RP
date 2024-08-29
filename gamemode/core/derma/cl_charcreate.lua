@@ -454,8 +454,6 @@ function PANEL:SendPayload()
 	end
 
 	net.SendToServer()
-
-	surface.PlaySound("eternalis/signalis_ui/save.wav")
 end
 
 function PANEL:OnSlideUp()

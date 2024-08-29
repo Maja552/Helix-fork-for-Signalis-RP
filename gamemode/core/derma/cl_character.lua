@@ -242,7 +242,7 @@ function PANEL:Init()
 		-- don't allow creation if we've hit the character limit
 		if (#ix.characters >= maximum) then
 			self:GetParent():ShowNotice(3, L("maxCharacters"))
-			surface.PlaySound("eternalis/signalis_ui/no.wav")
+			hook.Run("OnCharacterLimitFailure", maximum)
 			return
 		end
 

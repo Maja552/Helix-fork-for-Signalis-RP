@@ -1335,8 +1335,6 @@ do
 		end)
 
 		net.Receive("ixCharacterLoadFailure", function()
-			surface.PlaySound("eternalis/signalis_ui/no.wav")
-
 			local message = net.ReadString()
 
 			if (isstring(message) and message:sub(1, 1) == "@") then
@@ -1350,6 +1348,8 @@ do
 			else
 				ix.util.Notify(message)
 			end
+
+			hook.Run("CharacterLoadFailed", message)
 		end)
 
 		net.Receive("ixCharacterData", function()
