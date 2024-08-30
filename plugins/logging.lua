@@ -197,7 +197,7 @@ if (SERVER) then
 
 		ix.log.Add(character:GetPlayer(), "inventoryAdd", character:GetName(), item:GetName(), item:GetID())
 
-		if (item.isBag) then
+		if (item.isBag and item.GetInventory) then
 			local bagInventory = item:GetInventory()
 
 			if (!bagInventory) then
@@ -219,7 +219,7 @@ if (SERVER) then
 
 		ix.log.Add(character:GetPlayer(), "inventoryRemove", character:GetName(), item:GetName(), item:GetID())
 
-		if (item.isBag) then
+		if (item.isBag and item.GetInventory) then
 			for _, v in pairs(item:GetInventory():GetItems()) do
 				ix.log.Add(character:GetPlayer(), "inventoryRemove", character:GetName(), v:GetName(), v:GetID())
 			end

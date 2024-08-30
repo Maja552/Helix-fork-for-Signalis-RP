@@ -526,7 +526,7 @@ do
 			end
 
 			-- we need to close any bag windows that are open because of this item
-			if (item.isBag) then
+			if (item.isBag and item.GetInventory) then
 				local itemInv = item:GetInventory()
 
 				if (itemInv) then
