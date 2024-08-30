@@ -17,7 +17,6 @@ local function RenderNewIcon(panel, itemTable)
 			cam_ang = iconCam.ang,
 			cam_fov = iconCam.fov,
 		}
-		PrintTable(iconCam)
 		ICON_RENDER_QUEUE[string.lower(model)] = true
 
 		panel.Icon:RebuildSpawnIconEx(
