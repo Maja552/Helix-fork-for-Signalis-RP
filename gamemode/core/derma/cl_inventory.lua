@@ -7,7 +7,6 @@ ICON_RENDER_QUEUE = ICON_RENDER_QUEUE or {}
 -- To make making inventory variant, This must be followed up.
 local function RenderNewIcon(panel, itemTable)
 	local model = itemTable:GetModel()
-	print(panel, model, itemTable)
 
 	-- re-render icons
 	if itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender) then
