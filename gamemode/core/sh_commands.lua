@@ -774,10 +774,62 @@ ix.command.Add("PlyWhitelistClass", {
 				end
 
 				if !isEternalisPlayerVerified(target) then
-					--return "@playedNotVerified"
+					return "@playedNotVerified"
 				end
 
 				checkProtektorWhitelistsSteamid(self, client, targetPlayer, class)
+			end
+		else
+			return "@invalidClass"
+		end
+	end
+})
+
+ix.command.Add("PlyForceWhitelistClass", {
+	description = "@cmdPlyWhitelistClass",
+	privilege = "Manage Class Whitelist",
+	superAdminOnly = true,
+	arguments = {
+		ix.type.string,
+		ix.type.text
+	},
+	OnRun = function(self, client, target, name)
+		if (target == "") then
+			return "@invalidArg", 1
+		end
+		if (name == "") then
+			return "@invalidArg", 2
+		end
+
+		local class = ix.class.list[name]
+		if (!class) then
+			for _, v in ipairs(ix.class.list) do
+				if (ix.util.StringMatches(L(v.name, client), name) or ix.util.StringMatches(v.uniqueID, name)) then
+					class = v
+					break
+				end
+			end
+		end
+
+		if (class) then
+			local targetPlayer = ix.util.FindPlayer(target)
+
+			if IsValid(targetPlayer) then
+				WhitelistPlayer(self, client, targetPlayer, class)
+			else
+				if !isValidSteamid(target) then
+					return "@invalidSteamID"
+				end
+
+				if (target:sub(1, 5) == "STEAM") then
+					target = util.SteamIDTo64(target)
+				end
+
+				if !isEternalisPlayerVerified(target) then
+					return "@playedNotVerified"
+				end
+				
+				WhitelistSteamid(self, client, target, class)
 			end
 		else
 			return "@invalidClass"
