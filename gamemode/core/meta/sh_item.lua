@@ -527,6 +527,9 @@ if (SERVER) then
 			entity:Spawn()
 			entity:SetAngles(angles or Angle(0, 0, 0))
 			entity:SetItem(self.id)
+			if self.scale then
+				entity:SetModelScale(self.scale)
+			end
 
 			-- If the first argument is a player, then we will find a position to drop
 			-- the item based off their aim.
