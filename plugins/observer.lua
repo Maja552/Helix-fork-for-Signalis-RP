@@ -111,6 +111,7 @@ if (CLIENT) then
 		end
 	end
 else
+	/*
 	ix.log.AddType("observerEnter", function(client, ...)
 		return string.format("%s entered observer.", client:Name())
 	end)
@@ -122,6 +123,7 @@ else
 			return string.format("%s exited observer at their location.", client:Name())
 		end
 	end)
+	*/
 
 	function PLUGIN:CanPlayerEnterObserver(client)
 		if (CAMI.PlayerHasAccess(client, "Helix - Observer", nil)) then
