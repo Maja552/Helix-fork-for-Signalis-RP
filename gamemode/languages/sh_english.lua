@@ -473,4 +473,6 @@ LANGUAGE = {
 	nameInUse = "This name is already in use.",
 	pitch = "Voice pitch",
 	protektorWhitelist = "That user already has a protektor whitelist.",
+	noWhitelistInPlayerData = "No whitelist found for this player in player data.",
+	noWhitelistInQueued = "No whitelist found for this player in queued data.",
 }

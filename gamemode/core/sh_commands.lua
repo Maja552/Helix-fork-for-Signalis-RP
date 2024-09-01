@@ -53,7 +53,6 @@ function checkProtektorWhitelists(this, client, targetPlayer, class)
 	query:Execute()
 end
 
--- lua_run checkProtektorWhitelistsSteamid("76561198041940108", "replika_arar")
 function checkProtektorWhitelistsSteamid(this, client, steamId, class)
 	if class.isProtektor == false then
 		WhitelistSteamid(this, client, steamId, class)
@@ -777,7 +776,7 @@ ix.command.Add("PlyWhitelistClass", {
 					return "@playedNotVerified"
 				end
 
-				checkProtektorWhitelistsSteamid(self, client, targetPlayer, class)
+				checkProtektorWhitelistsSteamid(self, client, target, class)
 			end
 		else
 			return "@invalidClass"
@@ -892,35 +891,70 @@ ix.command.Add("PlyUnwhitelistFaction", {
 					end
 				end
 			else
+				-- checking player data
 				local steamID64 = util.SteamIDTo64(target)
 				local query = mysql:Select("ix_players")
-					query:Select("data")
-					query:Where("steamid", steamID64)
-					query:Limit(1)
-					query:Callback(function(result)
-						if (istable(result) and #result > 0) then
-							local data = util.JSONToTable(result[1].data or "[]")
-							local whitelists = data.whitelists and data.whitelists[Schema.folder]
+				query:Select("data")
+				query:Where("steamid", steamID64)
+				query:Limit(1)
+				query:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						local data = util.JSONToTable(result[1].data or "[]")
+						local whitelists = data.whitelists and data.whitelists[Schema.folder]
 
-							if (!whitelists or !whitelists[faction.uniqueID]) then
-								return
-							end
+						if (!whitelists or !whitelists[faction.uniqueID]) then
+							client:NotifyLocalized("noWhitelistInPlayerData")
+							return
+						end
 
-							whitelists[faction.uniqueID] = nil
+						whitelists[faction.uniqueID] = nil
 
-							local updateQuery = mysql:Update("ix_players")
-								updateQuery:Update("data", util.TableToJSON(data))
-								updateQuery:Where("steamid", steamID64)
-							updateQuery:Execute()
+						local updateQuery = mysql:Update("ix_players")
+							updateQuery:Update("data", util.TableToJSON(data))
+							updateQuery:Where("steamid", steamID64)
+						updateQuery:Execute()
 
-							for _, v in player.Iterator() do
-								if (self:OnCheckAccess(v)) then
-									v:NotifyLocalized("unwhitelist", client:GetName(), target, L(faction.name, v))
-								end
+						for _, v in player.Iterator() do
+							if (self:OnCheckAccess(v)) then
+								v:NotifyLocalized("unwhitelist", client:GetName(), target, L(faction.name, v))
 							end
 						end
-					end)
+					else
+						client:NotifyLocalized("noWhitelistInPlayerData")
+					end
+				end)
 				query:Execute()
+
+				print("checking queued whitelists for ", target)
+
+				-- also check queued whitelists
+				local queryQueued = mysql:Select("ix_queued_whitelists")
+				queryQueued:Select("index")
+				queryQueued:Where("type", "faction")
+				queryQueued:Where("steamid", target)
+				queryQueued:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						for k,v in pairs(result) do
+							if tonumber(v.index) == faction.index then
+								-- delete the queued whitelist
+								local deleteQuery = mysql:Delete("ix_queued_whitelists")
+								deleteQuery:Where("type", "faction")
+								deleteQuery:Where("steamid", target)
+								deleteQuery:Where("index", faction.index)
+								deleteQuery:Execute()
+
+								for _, v in player.Iterator() do
+									if (self:OnCheckAccess(v)) then
+										v:NotifyLocalized("unwhitelist", client:GetName(), target, L(faction.name, v))
+									end
+								end
+								return
+							end
+						end
+					end
+					client:NotifyLocalized("noWhitelistInQueued")
+				end)
+				queryQueued:Execute()
 			end
 		else
 			return "@invalidFaction"
@@ -943,7 +977,6 @@ ix.command.Add("PlyUnwhitelistClass", {
 			for _, v in ipairs(ix.class.list) do
 				if (ix.util.StringMatches(L(v.name, client), name) or ix.util.StringMatches(v.uniqueID, name)) then
 					class = v
-
 					break
 				end
 			end
@@ -961,33 +994,65 @@ ix.command.Add("PlyUnwhitelistClass", {
 			else
 				local steamID64 = util.SteamIDTo64(target)
 				local query = mysql:Select("ix_players")
-					query:Select("data")
-					query:Where("steamid", steamID64)
-					query:Limit(1)
-					query:Callback(function(result)
-						if (istable(result) and #result > 0) then
-							local data = util.JSONToTable(result[1].data or "[]")
-							local class_whitelists = data.class_whitelists and data.class_whitelists[Schema.folder]
+				query:Select("data")
+				query:Where("steamid", steamID64)
+				query:Limit(1)
+				query:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						local data = util.JSONToTable(result[1].data or "[]")
+						local class_whitelists = data.class_whitelists and data.class_whitelists[Schema.folder]
 
-							if (!class_whitelists or !class_whitelists[class.uniqueID]) then
-								return
-							end
+						if (!class_whitelists or !class_whitelists[class.uniqueID]) then
+							client:NotifyLocalized("noWhitelistInPlayerData")
+							return
+						end
 
-							class_whitelists[class.uniqueID] = nil
+						class_whitelists[class.uniqueID] = nil
 
-							local updateQuery = mysql:Update("ix_players")
-								updateQuery:Update("data", util.TableToJSON(data))
-								updateQuery:Where("steamid", steamID64)
-							updateQuery:Execute()
+						local updateQuery = mysql:Update("ix_players")
+						updateQuery:Update("data", util.TableToJSON(data))
+						updateQuery:Where("steamid", steamID64)
+						updateQuery:Execute()
 
-							for _, v in ipairs(player.GetAll()) do
-								if (self:OnCheckAccess(v)) then
-									v:NotifyLocalized("class_unwhitelist", client:GetName(), target, L(class.name, v))
-								end
+						for _, v in ipairs(player.GetAll()) do
+							if (self:OnCheckAccess(v)) then
+								v:NotifyLocalized("class_unwhitelist", client:GetName(), target, L(class.name, v))
 							end
 						end
-					end)
+					else
+						client:NotifyLocalized("noWhitelistInPlayerData")
+					end
+				end)
 				query:Execute()
+
+				-- also check queued whitelists
+				local queryQueued = mysql:Select("ix_queued_whitelists")
+				queryQueued:Select("index")
+				queryQueued:Where("type", "class")
+				queryQueued:Where("steamid", target)
+				queryQueued:Callback(function(result)
+					if (istable(result) and #result > 0) then
+						for k,v in pairs(result) do
+							if tonumber(v.index) == class.index then
+								-- delete the queued whitelist
+								local deleteQuery = mysql:Delete("ix_queued_whitelists")
+								deleteQuery:Where("type", "class")
+								deleteQuery:Where("steamid", target)
+								deleteQuery:Where("index", class.index)
+								deleteQuery:Execute()
+
+								for _, v in player.Iterator() do
+									if (self:OnCheckAccess(v)) then
+										v:NotifyLocalized("class_unwhitelist", client:GetName(), target, L(class.name, v))
+									end
+								end
+								return
+							end
+						end
+					end
+					client:NotifyLocalized("noWhitelistInQueued")
+				end)
+				queryQueued:Execute()
 			end
 		else
 			return "@invalidClass"
