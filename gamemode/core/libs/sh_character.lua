@@ -386,6 +386,8 @@ do
 		max = 110,
 		index = 2,
 		OnValidate = function(self, value, payload)
+			if payload.faction != FACTION_GESTALT then return 100 end
+
 			if (!value) then
 				return false, "invalid", "pitch"
 			end
@@ -421,6 +423,8 @@ do
 		max = 1.1,
 		index = 3,
 		OnValidate = function(self, value, payload)
+			if payload.faction != FACTION_GESTALT then return 1 end
+
 			if (!value) then
 				return false, "invalid", "talkspeed"
 			end
