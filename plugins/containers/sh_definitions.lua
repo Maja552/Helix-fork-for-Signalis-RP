@@ -79,6 +79,13 @@ ix.container.Register("models/props_junk/trashbin01a.mdl", {
 	height = 2,
 })
 
+ix.container.Register("models/props_trainstation/trashcan_indoor001a.mdl", {
+	name = "Trash Bin",
+	description = "What do you expect to find in here?",
+	width = 2,
+	height = 2,
+})
+
 ix.container.Register("models/props_junk/trashdumpster01a.mdl", {
 	name = "Dumpster",
 	description = "A dumpster meant to stow away trash. It emanates an unpleasant smell.",
