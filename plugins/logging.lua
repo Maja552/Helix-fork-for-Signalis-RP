@@ -8,16 +8,28 @@ if (SERVER) then
 
 	ix.log.AddType("chat", function(client, ...)
 		local arg = {...}
-		return L("[%s] %s: %s", arg[1], client:Name(), arg[2])
+		if client:SteamName() == client:Name() then
+			return L("[%s] %s: %s", arg[1], client:Name(), arg[2])
+		else
+			return L("[%s] %s (%s): %s", arg[1], client:Name(), client:SteamName(), arg[2])
+		end
 	end)
 
 	ix.log.AddType("command", function(client, ...)
 		local arg = {...}
 
 		if (arg[2] and #arg[2] > 0) then
-			return L("%s used command '%s %s'.", client:Name(), arg[1], arg[2])
+			if client:SteamName() == client:Name() then
+				return L("%s used command '%s %s'.", client:Name(), arg[1], arg[2])
+			else
+				return L("%s (%s) used command '%s %s'.", client:Name(), client:SteamName(), arg[1], arg[2])
+			end
 		else
-			return L("%s used command '%s'.", client:Name(), arg[1])
+			if client:SteamName() == client:Name() then
+				return L("%s used command '%s'.", client:Name(), arg[1])
+			else
+				return L("%s (%s) used command '%s'.", client:Name(), client:SteamName(), arg[1])
+			end
 		end
 	end)
 
