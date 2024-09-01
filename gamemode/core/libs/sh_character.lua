@@ -406,7 +406,7 @@ do
 			local delay = ix.config.Get("SignalisTalkSoundsSpeed", 0.075) * (2 - (payload.talkspeed or 1))
 
 			timer.Create("talkspeed_test", delay, 6, function()
-				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, value or 100, 1)
+				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, value or 100, 0.5)
 			end)
 		end
 	})
@@ -441,7 +441,7 @@ do
 			local delay = ix.config.Get("SignalisTalkSoundsSpeed", 0.075) * (2 - value)
 
 			timer.Create("talkspeed_test", delay, 6, function()
-				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, payload.pitch or 100, 1)
+				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, payload.pitch or 100, 0.5)
 			end)
 		end
 	})
