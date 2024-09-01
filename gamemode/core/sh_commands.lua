@@ -4,12 +4,12 @@ local function isValidSteamid(steamid)
 end
 
 local function isEternalisPlayerVerified(steamid)
-    local jsonDB = file.Read("eternalis/auth/db.txt", "DATA")
+    local jsonDB = file.Read("eternalis/db.json", "DATA")
     if jsonDB then
         local database = util.JSONToTable(jsonDB, false, true)
         local playerData = database[steamid]
 
-        if playerData and playerData["whitelisted"] then
+        if playerData and playerData["discordId"] then
             return true
         end
     end
