@@ -376,11 +376,12 @@ do
 		end
 	})
 
-	--pitch
+	--voice pitch
 	ix.char.RegisterVar("pitch", {
 		field = "pitch",
 		fieldType = ix.type.number,
 		default = 100,
+		decimals = 0,
 		min = 90,
 		max = 110,
 		index = 2,
@@ -397,12 +398,52 @@ do
 
 			return value
 		end,
-		OnPostSetup = function(self, panel, payload)
+		ShouldDisplay = function(self, container, payload)
+			return payload["faction"] == FACTION_GESTALT
+		end,
+		OnValueChanged = function(self, value, payload)
+			-- make a timer to test the new talk speed by playing the sound for a few times
+			local delay = ix.config.Get("SignalisTalkSoundsSpeed", 0.075) * (2 - (payload.talkspeed or 1))
+
+			timer.Create("talkspeed_test", delay, 6, function()
+				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, value or 100, 1)
+			end)
+		end
+	})
+
+	--talk speed
+	ix.char.RegisterVar("talkspeed", {
+		field = "talkspeed",
+		fieldType = ix.type.number,
+		default = 1.0,
+		decimals = 1,
+		min = 0.8,
+		max = 1.1,
+		index = 3,
+		OnValidate = function(self, value, payload)
+			if (!value) then
+				return false, "invalid", "talkspeed"
+			end
+
+			value = tonumber(value)
+
+			if (value < 0.8 or value > 1.1) then
+				return false, "invalid", "talkspeed"
+			end
+
+			return value
 		end,
 		ShouldDisplay = function(self, container, payload)
 			return payload["faction"] == FACTION_GESTALT
 		end,
-		alias = "Desc"
+		OnValueChanged = function(self, value, payload)
+			-- make a timer to test the new talk speed by playing the sound for a few times
+			local delay = ix.config.Get("SignalisTalkSoundsSpeed", 0.075) * (2 - value)
+
+			timer.Create("talkspeed_test", delay, 6, function()
+				LocalPlayer():EmitSound("eternalis/ui/voice_text.wav", 75, payload.pitch or 100, 1)
+			end)
+		end
 	})
 
 
@@ -419,7 +460,7 @@ do
 		field = "description",
 		fieldType = ix.type.text,
 		default = "",
-		index = 3,
+		index = 4,
 		OnValidate = function(self, value, payload)
 			value = string.Trim((tostring(value):gsub("\r\n", ""):gsub("\n", "")))
 			local minLength = ix.config.Get("minDescriptionLength", 16)
@@ -459,7 +500,7 @@ do
 		field = "model",
 		fieldType = ix.type.string,
 		default = "models/error.mdl",
-		index = 4,
+		index = 5,
 		OnSet = function(character, value)
 			local client = character:GetPlayer()
 
@@ -748,7 +789,7 @@ do
 		field = "attributes",
 		fieldType = ix.type.text,
 		default = {},
-		index = 4,
+		index = 6,
 		category = "attributes",
 		isLocal = true,
 		OnDisplay = function(self, container, payload)

@@ -732,6 +732,7 @@ function PANEL:Populate(redo)
 				panel.OnValueChange = function(this, text)
 					self.payload:Set(k, text)
 				end
+
 			elseif (isnumber(v.default)) then
 				panel = container:Add("ixTextEntry")
 				panel:SetHeight(64)
@@ -742,11 +743,15 @@ function PANEL:Populate(redo)
 				slider:SetText("")
 				slider:SetMin(v.min or 0)
 				slider:SetMax(v.max or 100)
-				slider:SetDecimals(0)
+				slider:SetDecimals(v.decimals or 0)
+				slider:SetValue(v.default)
 				slider.OnValueChanged = function(this, value)
+					if v.OnValueChanged then
+						v:OnValueChanged(value, self.payload)
+					end
+
 					self.payload:Set(k, value)
 				end
-				slider:SetValue(v.default)
 			end
 
 			if (IsValid(panel)) then
