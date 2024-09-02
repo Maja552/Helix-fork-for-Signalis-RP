@@ -208,9 +208,15 @@ function ITEM:CanTransfer(oldInventory, newInventory)
 			return false
 		end
 
-		for _, v in pairs(self:GetInventory():GetItems()) do
-			if (v:GetData("id") == index2) then
-				return false
+		local inventory = self:GetInventory()
+		if inventory then
+			local items = inventory:GetItems()
+			if items then
+				for _, v in pairs(items) do
+					if (v:GetData("id") == index2) then
+						return false
+					end
+				end
 			end
 		end
 	end
