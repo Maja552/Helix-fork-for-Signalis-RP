@@ -183,6 +183,7 @@ else
 		end
 	end
 
+	/*
 	function PLUGIN:OnPlayerObserve(client, state)
 		if (state) then
 			ix.log.Add(client, "observerEnter")
@@ -190,4 +191,5 @@ else
 			ix.log.Add(client, "observerExit")
 		end
 	end
+	*/
 end
