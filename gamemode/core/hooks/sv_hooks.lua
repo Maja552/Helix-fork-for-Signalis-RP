@@ -336,7 +336,7 @@ function GM:PlayerSay(client, text)
 
 	text = ix.chat.Send(client, chatType, message, anonymous)
 
-	if (isstring(text) and chatType != "ic") then
+	if (isstring(text)) then
 		ix.log.Add(client, "chat", chatType and chatType:utf8upper() or "??", text)
 	end
 
