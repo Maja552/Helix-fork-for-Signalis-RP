@@ -6,12 +6,20 @@ PLUGIN.description = "You can modfiy the logging text/lists on this plugin."
 if (SERVER) then
 	local L = Format
 
+	local function PlyName(client)
+		if client:SteamName() == client:Name() then
+			return client:Name() .. " (" .. client:SteamID64() .. ")"
+		else
+			return client:Name() .. " (" .. client:SteamName() .. ", " .. client:SteamID64() .. ")"
+		end
+	end
+
 	ix.log.AddType("chat", function(client, ...)
 		local arg = {...}
 		if client:SteamName() == client:Name() then
-			return L("[%s] %s: %s", arg[1], client:Name(), arg[2])
+			return L("[%s] %s: %s", arg[1], PlyName(client), arg[2])
 		else
-			return L("[%s] %s (%s): %s", arg[1], client:Name(), client:SteamName(), arg[2])
+			return L("[%s] %s: %s", arg[1], PlyName(client), arg[2])
 		end
 	end)
 
@@ -20,111 +28,115 @@ if (SERVER) then
 
 		if (arg[2] and #arg[2] > 0) then
 			if client:SteamName() == client:Name() then
-				return L("%s used command '%s %s'.", client:Name(), arg[1], arg[2])
+				return L("%s used command '%s %s'.", PlyName(client), arg[1], arg[2])
 			else
-				return L("%s (%s) used command '%s %s'.", client:Name(), client:SteamName(), arg[1], arg[2])
+				return L("%s used command '%s %s'.", PlyName(client), arg[1], arg[2])
 			end
 		else
 			if client:SteamName() == client:Name() then
-				return L("%s used command '%s'.", client:Name(), arg[1])
+				return L("%s used command '%s'.", PlyName(client), arg[1])
 			else
-				return L("%s (%s) used command '%s'.", client:Name(), client:SteamName(), arg[1])
+				return L("%s used command '%s'.", PlyName(client), arg[1])
 			end
 		end
 	end)
 
 	ix.log.AddType("cfgSet", function(client, ...)
 		local arg = {...}
-		return L("%s set %s to '%s'.", client:Name(), arg[1], arg[2])
+		return L("%s set %s to '%s'.", PlyName(client), arg[1], arg[2])
 	end, FLAG_DANGER)
 
 	ix.log.AddType("connect", function(client, ...)
-		return L("%s has connected.", client:SteamName())
+		return L("%s has connected.", PlyName(client))
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("disconnect", function(client, ...)
 		if (client:IsTimingOut()) then
-			return L("%s (%s) has disconnected (timed out).", client:SteamName(), client:SteamID())
+			return L("%s has disconnected (timed out).", PlyName(client))
 		else
-			return L("%s (%s) has disconnected.", client:SteamName(), client:SteamID())
+			return L("%s has disconnected.", PlyName(client))
 		end
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("charCreate", function(client, ...)
 		local arg = {...}
-		return L("%s created the character '%s'", client:SteamName(), arg[1])
+		return L("%s created the character '%s'", PlyName(client), arg[1])
 	end, FLAG_SERVER)
 
 	ix.log.AddType("charLoad", function(client, ...)
 		local arg = {...}
-		return L("%s loaded the character '%s'", client:SteamName(), arg[1])
+		return L("%s loaded the character '%s'", PlyName(client), arg[1])
 	end, FLAG_SERVER)
 
 	ix.log.AddType("charDelete", function(client, ...)
 		local arg = {...}
-		return L("%s (%s) deleted character '%s'", client:SteamName(), client:SteamID(), arg[1])
+		return L("%s deleted character '%s'", PlyName(client), arg[1])
 	end, FLAG_SERVER)
 
 	ix.log.AddType("itemAction", function(client, ...)
 		local arg = {...}
 		local item = arg[2]
-		return L("%s ran '%s' on item '%s' (#%s)", client:Name(), arg[1], item:GetName(), item:GetID())
+		return L("%s ran '%s' on item '%s' (#%s)", PlyName(client), arg[1], item:GetName(), item:GetID())
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("itemDestroy", function(client, itemName, itemID)
 		local name = client:GetName() ~= "" and client:GetName() or client:GetClass()
-		return L("%s destroyed a '%s' #%d.", name, itemName, itemID)
+		if (client:IsPlayer()) then
+			return L("%s destroyed a '%s' #%d.", PlyName(client), itemName, itemID)
+		else
+			return L("%s destroyed a '%s' #%d.", name, itemName, itemID)
+		end
 	end, FLAG_WARNING)
 
 	ix.log.AddType("shipmentTake", function(client, ...)
 		local arg = {...}
-		return L("%s took '%s' from the shipment", client:Name(), arg[1])
+		return L("%s took '%s' from the shipment", PlyName(client), arg[1])
 	end, FLAG_WARNING)
 
 	ix.log.AddType("shipmentOrder", function(client, ...)
-		return L("%s ordered a shipment", client:Name())
+		return L("%s ordered a shipment", PlyName(client))
 	end, FLAG_SUCCESS)
 
 	ix.log.AddType("buy", function(client, ...)
 		local arg = {...}
-		return L("%s purchased '%s' from the NPC", client:Name(), arg[1])
+		return L("%s purchased '%s' from the NPC", PlyName(client), arg[1])
 	end, FLAG_SUCCESS)
 
 	ix.log.AddType("buydoor", function(client, ...)
-		return L("%s has purchased a door.", client:Name())
+		return L("%s has purchased a door.", PlyName(client))
 	end, FLAG_SUCCESS)
 
 	ix.log.AddType("selldoor", function(client, ...)
-		return L("%s has sold a door.", client:Name())
+		return L("%s has sold a door.", PlyName(client))
 	end, FLAG_SUCCESS)
 
 	ix.log.AddType("playerHurt", function(client, ...)
 		local arg = {...}
-		return L("%s has taken %d damage from %s.", client:Name(), arg[1], arg[2])
+		return L("%s has taken %d damage from %s.", PlyName(client), arg[1], arg[2])
 	end, FLAG_WARNING)
 
 	ix.log.AddType("playerDeath", function(client, ...)
 		local arg = {...}
-		return L("%s has killed %s%s.", arg[1], client:Name(), arg[2] and (" with " .. arg[2]) or "")
+		return L("%s has killed %s%s.", arg[1], PlyName(client), arg[2] and (" with " .. arg[2]) or "")
 	end, FLAG_DANGER)
 
 	ix.log.AddType("money", function(client, amount)
-		return L("%s has %s %s.", client:Name(), amount < 0 and "lost" or "gained", ix.currency.Get(math.abs(amount)))
+		return L("%s has %s %s.", PlyName(client), amount < 0 and "lost" or "gained", ix.currency.Get(math.abs(amount)))
 	end, FLAG_SUCCESS)
 
 	ix.log.AddType("inventoryAdd", function(client, characterName, itemName, itemID)
-		return L("%s has gained a '%s' #%d.", characterName, itemName, itemID)
+		return L("%s has gained a '%s' #%d.", PlyName(client), itemName, itemID)
 	end, FLAG_WARNING)
 
 	ix.log.AddType("inventoryRemove", function(client, characterName, itemName, itemID)
-		return L("%s has lost a '%s' #%d.", characterName, itemName, itemID)
+		return L("%s has lost a '%s' #%d.", PlyName(client), itemName, itemID)
 	end, FLAG_WARNING)
 
 	ix.log.AddType("storageMoneyTake", function(client, entity, amount, total)
 		local name = entity.GetDisplayName and entity:GetDisplayName() or entity:GetName()
 
 		return string.format("%s has taken %d %s from '%s' #%d (%d %s left).",
-			client:GetName(), amount, ix.currency.plural, name,
+			PlyName(client), amount, ix.currency.plural, name,
 			entity:GetInventory():GetID(), total, ix.currency.plural)
 	end)
 
@@ -132,7 +144,7 @@ if (SERVER) then
 		local name = entity.GetDisplayName and entity:GetDisplayName() or entity:GetName()
 
 		return string.format("%s has given %d %s to '%s' #%d (%d %s left).",
-			client:GetName(), amount, ix.currency.plural, name,
+			PlyName(client), amount, ix.currency.plural, name,
 			entity:GetInventory():GetID(), total, ix.currency.plural)
 	end)
 
@@ -141,11 +153,11 @@ if (SERVER) then
 	end)
 
 	ix.log.AddType("pluginLoaded", function(client, uniqueID)
-		return string.format("%s has enabled the %s plugin for next restart.", client:GetName(), uniqueID)
+		return string.format("%s has enabled the %s plugin for next restart.", PlyName(client), uniqueID)
 	end)
 
 	ix.log.AddType("pluginUnloaded", function(client, uniqueID)
-		return string.format("%s has disabled the %s plugin for next restart.", client:GetName(), uniqueID)
+		return string.format("%s has disabled the %s plugin for next restart.", PlyName(client), uniqueID)
 	end)
 
 	function PLUGIN:PlayerInitialSpawn(client)
