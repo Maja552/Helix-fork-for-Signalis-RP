@@ -77,7 +77,7 @@ function PLUGIN:LoadData()
 									item.invID = 0
 									loadedItems[#loadedItems + 1] = item
 
-									if (item.isBag) then
+									if (item.isBag and ix.item.inventoryTypes[uniqueID]) then
 										local invType = ix.item.inventoryTypes[uniqueID]
 										bagInventories[item:GetData("id")] = {invType.w, invType.h}
 									end
