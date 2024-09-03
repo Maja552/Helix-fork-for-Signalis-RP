@@ -54,14 +54,17 @@ if (CLIENT) then
 				local alpha = math.max(255 * factor, 80)
 				local aimAlpha = (1 - factor * 1.5) * 80
 
+				local colorRet = hook.Run("OnObserverESP", v, x, y, size, alpha)
+				if colorRet then
+					teamColor = colorRet
+				end
+
 				surface.SetDrawColor(teamColor.r, teamColor.g, teamColor.b, alpha)
 				surface.SetFont("ixGenericFont")
 
 				local text = v:Name()
 				local textWidth, textHeight = surface.GetTextSize(text)
 				local barWidth = math.Clamp((v:Health() / v:GetMaxHealth()) * textWidth, 0, textWidth)
-
-				hook.Run("OnObserverESP", v, x, y, size, alpha)
 
 				surface.DrawRect(x - size / 2, y - size / 2, size, size)
 
