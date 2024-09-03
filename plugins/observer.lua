@@ -61,6 +61,8 @@ if (CLIENT) then
 				local textWidth, textHeight = surface.GetTextSize(text)
 				local barWidth = math.Clamp((v:Health() / v:GetMaxHealth()) * textWidth, 0, textWidth)
 
+				hook.Run("OnObserverESP", v, x, y, size, alpha)
+
 				surface.DrawRect(x - size / 2, y - size / 2, size, size)
 
 				-- we can assume that if we're using cheap blur, we'd want to save some fps here
