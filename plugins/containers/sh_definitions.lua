@@ -19,8 +19,8 @@ ix.container.Register("models/props_junk/wood_crate001a.mdl", {
 ix.container.Register("models/props_c17/lockers001a.mdl", {
 	name = "Locker",
 	description = "A white locker.",
-	width = 3,
-	height = 5,
+	width = 4,
+	height = 6,
 })
 
 ix.container.Register("models/props_wasteland/controlroom_storagecloset001a.mdl", {
@@ -61,29 +61,29 @@ ix.container.Register("models/props_lab/filecabinet02.mdl", {
 ix.container.Register("models/props_c17/furniturefridge001a.mdl", {
 	name = "Refrigerator",
 	description = "A metal box for keeping food in.",
-	width = 2,
-	height = 3,
+	width = 3,
+	height = 5,
 })
 
 ix.container.Register("models/props_wasteland/kitchen_fridge001a.mdl", {
 	name = "Large Refrigerator",
 	description = "A large metal box for storing even more food in.",
-	width = 4,
-	height = 5,
+	width = 5,
+	height = 6,
 })
 
 ix.container.Register("models/props_junk/trashbin01a.mdl", {
 	name = "Trash Bin",
 	description = "What do you expect to find in here?",
 	width = 2,
-	height = 2,
+	height = 3,
 })
 
 ix.container.Register("models/props_trainstation/trashcan_indoor001a.mdl", {
 	name = "Trash Bin",
 	description = "What do you expect to find in here?",
 	width = 2,
-	height = 2,
+	height = 3,
 })
 
 ix.container.Register("models/props_junk/trashdumpster01a.mdl", {
