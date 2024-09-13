@@ -779,7 +779,7 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 
 			if (ix.option.Get("openBags", true)) then
 				for _, v in pairs(inventory:GetItems()) do
-					if (!v.isBag) then
+					if (!v.isBag and v.dontShowView != true) then
 						continue
 					end
 
