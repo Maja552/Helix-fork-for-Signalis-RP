@@ -633,7 +633,7 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 	end
 
 	-- don't allow bags to be put inside bags
-	if (inventory.id != 0 and curInv.id != inventory.id) then
+	if (inventory.id != 0 and curInv.id != inventory.id and itemObject.AllowItemNesting != true) then
 		if (inventory.vars and inventory.vars.isBag) then
 			local owner = itemObject:GetOwner()
 
@@ -660,6 +660,7 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 					owner:NotifyLocalized("equippedBag")
 				end
 
+				print("equippedBag")
 				return false
 			end
 		end
