@@ -763,7 +763,7 @@ function PANEL:Populate(redo)
 					hint:SetText(L(v.hint))
 					hint:SizeToContents()
 					hint:DockMargin(0, 2, 0, 0)
-					hint:Dock(TOP)
+					hint:Dock(RIGHT)
 				end
 
 				-- add label for entry
