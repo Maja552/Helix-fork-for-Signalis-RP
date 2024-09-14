@@ -89,6 +89,10 @@ if (SERVER) then
 				physObj:Wake()
 			end
 
+			if (itemTable:GetBodygroups()) then
+				self:SetBodyGroups(itemTable:GetBodygroups())
+			end
+
 			if (itemTable.OnEntityCreated) then
 				itemTable:OnEntityCreated(self)
 			end

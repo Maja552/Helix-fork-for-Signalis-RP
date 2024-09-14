@@ -228,6 +228,13 @@ function ITEM:GetSkin()
 	return self.skin or 0
 end
 
+--- Returns the bodygroups of the item.
+-- @realm shared
+-- @treturn string The bodygroups of the item
+function ITEM:GetBodygroups()
+	return self.bodygroups
+end
+
 function ITEM:GetMaterial()
 	return nil
 end
@@ -525,6 +532,7 @@ if (SERVER) then
 			-- Spawn the actual item entity.
 			local entity = ents.Create("ix_item")
 			entity:Spawn()
+
 			entity:SetAngles(angles or Angle(0, 0, 0))
 			entity:SetItem(self.id)
 			if self.scale then
@@ -544,6 +552,10 @@ if (SERVER) then
 				entity.ixSteamID = client:SteamID()
 				entity.ixCharID = client:GetCharacter():GetID()
 				entity:SetNetVar("owner", entity.ixCharID)
+			end
+
+			if isstring(self:GetBodygroups()) then
+				entity:SetBodyGroups(self:GetBodygroups())
 			end
 
 			hook.Run("OnItemSpawned", entity)
