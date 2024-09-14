@@ -338,7 +338,7 @@ function SKIN:PaintScrollBarGrip(panel, width, height)
 	local downButtonHeight = parent.btnDown:GetTall()
 
 	DisableClipping(true)
-		surface.SetDrawColor(30, 30, 30, 200)
+		surface.SetDrawColor(255, 255, 255, 200)
 		surface.DrawRect(4, -upButtonHeight, width - 8, height + upButtonHeight + downButtonHeight)
 	DisableClipping(false)
 end
