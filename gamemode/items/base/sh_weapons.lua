@@ -120,6 +120,10 @@ function ITEM:RemovePAC(client)
 end
 
 function ITEM:Equip(client, bNoSelect, bNoSound)
+	if self.CanEquip and self:CanEquip(client) == false then
+		return false
+	end
+
 	local items = client:GetCharacter():GetInventory():GetItems()
 
 	client.carryWeapons = client.carryWeapons or {}
