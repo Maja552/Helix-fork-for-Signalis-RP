@@ -72,7 +72,7 @@ function CHAR:GetInventoryHeight()
 
 	local class = ix.class.GetClass(self.vars.class)
 	if (class and class.add_inventory_height) then
-		w = w + class.add_inventory_height
+		h = h + class.add_inventory_height
 	end
 
 	return h
