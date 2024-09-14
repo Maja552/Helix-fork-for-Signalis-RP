@@ -153,7 +153,7 @@ ix.command.Add("Roll", {
 ix.command.Add("Event", {
 	description = "@cmdEvent",
 	arguments = ix.type.text,
-	superAdminOnly = true,
+	adminOnly = true,
 	OnRun = function(self, client, text)
 		ix.chat.Send(client, "event", text)
 	end
@@ -211,7 +211,7 @@ ix.command.Add("SetVoicemail", {
 ix.command.Add("CharGiveFlag", {
 	description = "@cmdCharGiveFlag",
 	privilege = "Manage Character Flags",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.character,
 		bit.bor(ix.type.string, ix.type.optional)
@@ -246,7 +246,7 @@ ix.command.Add("CharGiveFlag", {
 ix.command.Add("CharTakeFlag", {
 	description = "@cmdCharTakeFlag",
 	privilege = "Manage Character Flags",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.character,
 		bit.bor(ix.type.string, ix.type.optional)
@@ -281,7 +281,7 @@ ix.command.Add("ToggleRaise", {
 
 ix.command.Add("CharSetModel", {
 	description = "@cmdCharSetModel",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.character,
 		ix.type.string
@@ -414,7 +414,7 @@ ix.command.Add("CharSetName", {
 
 ix.command.Add("CharGiveItem", {
 	description = "@cmdCharGiveItem",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.character,
 		ix.type.string,
@@ -593,7 +593,7 @@ do
 		ix.command.Add("CharSet" .. MONEY_NAME, {
 			alias = {"CharSetMoney"},
 			description = "@cmdCharSetMoney",
-			superAdminOnly = true,
+			adminOnly = true,
 			arguments = {
 				ix.type.character,
 				ix.type.number
@@ -655,7 +655,7 @@ end
 ix.command.Add("PlyWhitelistFaction", {
 	description = "@cmdPlyWhitelistFaction",
 	privilege = "Manage Character Whitelist",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.string,
 		ix.type.text
@@ -735,7 +735,7 @@ ix.command.Add("PlyWhitelistFaction", {
 ix.command.Add("PlyWhitelistClass", {
 	description = "@cmdPlyWhitelistClass",
 	privilege = "Manage Class Whitelist",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.string,
 		ix.type.text
@@ -787,7 +787,7 @@ ix.command.Add("PlyWhitelistClass", {
 ix.command.Add("PlyForceWhitelistClass", {
 	description = "@cmdPlyWhitelistClass",
 	privilege = "Manage Class Whitelist",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.string,
 		ix.type.text
@@ -863,7 +863,7 @@ ix.command.Add("CharGetUp", {
 ix.command.Add("PlyUnwhitelistFaction", {
 	description = "@cmdPlyUnwhitelistFaction",
 	privilege = "Manage Character Whitelist",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.string,
 		ix.type.text
@@ -965,7 +965,7 @@ ix.command.Add("PlyUnwhitelistFaction", {
 ix.command.Add("PlyUnwhitelistClass", {
 	description = "@cmdPlyUnwhitelistClass",
 	privilege = "Manage Class Whitelist",
-	superAdminOnly = true,
+	adminOnly = true,
 	arguments = {
 		ix.type.string,
 		ix.type.text
