@@ -70,8 +70,9 @@ if (SERVER) then
 
 						ix.char.RestoreVars(data, data)
 
-						local w, h = ix.config.Get("inventoryWidth"), ix.config.Get("inventoryHeight")
 						local character = ix.char.New(data, lastID, client, data.steamID)
+						
+						local w, h = character:GetInventoryWidth(), character:GetInventoryHeight()
 						local inventory = ix.inventory.Create(w, h, invLastID)
 
 						character.vars.inv = {inventory}
@@ -163,7 +164,7 @@ if (SERVER) then
 										end
 
 										if (hook.Run("ShouldRestoreInventory", charID, v2.inventory_id, v2.inventory_type) != false) then
-											local w, h = ix.config.Get("inventoryWidth"), ix.config.Get("inventoryHeight")
+											local w, h = character:GetInventoryWidth(), character:GetInventoryHeight()
 											local invType
 
 											if (v2.inventory_type) then
@@ -194,7 +195,7 @@ if (SERVER) then
 									local insertQuery = mysql:Insert("ix_inventories")
 										insertQuery:Insert("character_id", charID)
 										insertQuery:Callback(function(_, status, lastID)
-											local w, h = ix.config.Get("inventoryWidth"), ix.config.Get("inventoryHeight")
+											local w, h = character:GetInventoryWidth(), character:GetInventoryHeight()
 											local inventory = ix.inventory.Create(w, h, lastID)
 											inventory:SetOwner(charID)
 

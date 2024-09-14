@@ -50,6 +50,34 @@ function CHAR:GetID()
 	return self.id
 end
 
+--- Returns the character's inventory width
+-- @realm shared
+-- @treturn number Returns the player's inventory width
+function CHAR:GetInventoryWidth()
+	local w = ix.config.Get("inventoryWidth")
+
+	local class = ix.class.GetClass(self.vars.class)
+	if (class and class.add_inventory_width) then
+		w = w + class.add_inventory_width
+	end
+
+	return w
+end
+
+--- Returns the character's inventory width
+-- @realm shared
+-- @treturn number Returns the player's inventory width
+function CHAR:GetInventoryHeight()
+	local h = ix.config.Get("inventoryHeight")
+
+	local class = ix.class.GetClass(self.vars.class)
+	if (class and class.add_inventory_height) then
+		w = w + class.add_inventory_height
+	end
+
+	return h
+end
+
 if (SERVER) then
 	--- Saves this character's info to the database.
 	-- @realm server
