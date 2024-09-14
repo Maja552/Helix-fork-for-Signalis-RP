@@ -3,7 +3,7 @@ local RECEIVER_NAME = "ixInventoryItem"
 
 -- The queue for the rendered icons.
 ICON_RENDER_QUEUE = ICON_RENDER_QUEUE or {}
-
+ 
 -- To make making inventory variant, This must be followed up.
 local function RenderNewIcon(panel, itemTable)
 	local model = itemTable:GetModel()
@@ -11,16 +11,33 @@ local function RenderNewIcon(panel, itemTable)
 	-- re-render icons
 	if itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender) then
 		local iconCam = itemTable.iconCam
+
+		-- for debugging
+		if FORCE_ICONCAM then
+			iconCam = FORCE_ICONCAM
+		end
+
 		iconCam = {
 			cam_pos = iconCam.pos,
 			cam_ang = iconCam.ang,
 			cam_fov = iconCam.fov,
 		}
+
+		-- insanely stupid workaround for bodygroups
+		if itemTable.bodygroups then
+			local ctrl = vgui.Create("DAdjustableModelPanel", panel)
+			ctrl:SetSize(300, 300)
+			ctrl:SetPos(ScrW() * 2, ScrH() * 2)
+			ctrl:SetModel(model)
+			ctrl:GetEntity():SetSkin(itemTable.skin)
+			ctrl:GetEntity():SetBodyGroups(itemTable.bodygroups)
+
+			iconCam.ent = ctrl:GetEntity()
+		end
+
 		ICON_RENDER_QUEUE[string.lower(model)] = true
 
-		panel.Icon:RebuildSpawnIconEx(
-			iconCam
-		)
+		panel.Icon:RebuildSpawnIconEx(iconCam)
 	end
 
 	if not itemTable.iconCam and itemTable.forceRender then
@@ -392,7 +409,7 @@ function PANEL:SetInventory(inventory, bFitParent)
 
 				if (item and !IsValid(self.panels[item.id])) then
 					local icon = self:AddIcon(item:GetModel() or "models/props_junk/popcan01a.mdl",
-						x, y, item.width, item.height, item:GetSkin())
+						x, y, item.width, item.height, item:GetSkin(), item:GetBodygroups())
 
 					if (IsValid(icon)) then
 						icon:SetHelixTooltip(function(tooltip)
@@ -634,7 +651,7 @@ function PANEL:OnTransfer(oldX, oldY, x, y, oldInventory, noSend)
 	end
 end
 
-function PANEL:AddIcon(model, x, y, w, h, skin)
+function PANEL:AddIcon(model, x, y, w, h, skin, bodygroups)
 	local iconSize = self.iconSize
 
 	w = w or 1
@@ -645,7 +662,14 @@ function PANEL:AddIcon(model, x, y, w, h, skin)
 		panel:SetSize(w * iconSize, h * iconSize)
 		panel:SetZPos(999)
 		panel:InvalidateLayout(true)
-		panel:SetModel(model, skin)
+		panel:SetModel(model, skin, bodygroups)
+
+		if bodygroups then
+			for i = 1, string.len(bodygroups) do
+				panel:SetBodyGroup(i - 1, tonumber(bodygroups[i]) or 0)
+			end
+		end
+
 		panel:SetPos(self.slots[x][y]:GetPos())
 		panel.gridX = x
 		panel.gridY = y

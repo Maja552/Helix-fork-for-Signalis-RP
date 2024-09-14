@@ -437,7 +437,7 @@ do
 
 					if (IsValid(panel)) then
 						local icon = panel:AddIcon(
-							item:GetModel() or "models/props_junk/popcan01a.mdl", x, y, item.width, item.height, item:GetSkin()
+							item:GetModel() or "models/props_junk/popcan01a.mdl", x, y, item.width, item.height, item:GetSkin(), item:GetBodygroups()
 						)
 
 						if (IsValid(icon)) then

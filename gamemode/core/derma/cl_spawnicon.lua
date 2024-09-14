@@ -16,7 +16,7 @@ function PANEL:Init()
 	end
 end
 
-function PANEL:SetModel(model, skin, hidden)
+function PANEL:SetModel(model, skin, bodygroups)
 	BaseClass.SetModel(self, model)
 
 	local entity = self.Entity
@@ -60,6 +60,10 @@ function PANEL:SetModel(model, skin, hidden)
 
 	entity:SetIK(false)
 	entity:SetEyeTarget(self.defaultEyeTarget)
+
+	if (bodygroups) then
+		entity:SetBodyGroups(bodygroups)
+	end
 end
 
 function PANEL:SetHidden(hidden)
