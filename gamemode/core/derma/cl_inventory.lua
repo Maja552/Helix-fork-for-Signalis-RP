@@ -9,7 +9,7 @@ local function RenderNewIcon(panel, itemTable)
 	local model = itemTable:GetModel()
 
 	-- re-render icons
-	if itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender) then
+	if (itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender or FORCE_ICONCAM != nil)) then
 		local iconCam = itemTable.iconCam
 
 		-- for debugging
@@ -23,24 +23,12 @@ local function RenderNewIcon(panel, itemTable)
 			cam_fov = iconCam.fov,
 		}
 
-		-- insanely stupid workaround for bodygroups
-		if itemTable.bodygroups then
-			local ctrl = vgui.Create("DAdjustableModelPanel", panel)
-			ctrl:SetSize(300, 300)
-			ctrl:SetPos(ScrW() * 2, ScrH() * 2)
-			ctrl:SetModel(model)
-			ctrl:GetEntity():SetSkin(itemTable.skin)
-			ctrl:GetEntity():SetBodyGroups(itemTable.bodygroups)
-
-			iconCam.ent = ctrl:GetEntity()
-		end
-
 		ICON_RENDER_QUEUE[string.lower(model)] = true
 
 		panel.Icon:RebuildSpawnIconEx(iconCam)
 	end
 
-	if not itemTable.iconCam and itemTable.forceRender then
+	if (not itemTable.iconCam and itemTable.forceRender) or true then
 		panel.Icon:RebuildSpawnIcon()
 	end
 end
@@ -664,12 +652,6 @@ function PANEL:AddIcon(model, x, y, w, h, skin, bodygroups)
 		panel:InvalidateLayout(true)
 		panel:SetModel(model, skin, bodygroups)
 
-		if bodygroups then
-			for i = 1, string.len(bodygroups) do
-				panel:SetBodyGroup(i - 1, tonumber(bodygroups[i]) or 0)
-			end
-		end
-
 		panel:SetPos(self.slots[x][y]:GetPos())
 		panel.gridX = x
 		panel.gridY = y
@@ -684,34 +666,62 @@ function PANEL:AddIcon(model, x, y, w, h, skin, bodygroups)
 
 		local itemTable = inventory:GetItemAt(panel.gridX, panel.gridY)
 
+		if itemTable.renderModelPanel then
+			local mdlPanel = vgui.Create("DModelPanel", panel)
+			mdlPanel:Dock(FILL)
+			mdlPanel:SetModel(model)
+
+			local ent = mdlPanel:GetEntity()
+
+			if bodygroups then
+				ent:SetBodyGroups(bodygroups)
+			end
+
+			function mdlPanel:LayoutEntity(entity) return end
+
+			mdlPanel:SetFOV(itemTable.renderModelPanel.fov)
+
+			mdlPanel:SetLookAt(itemTable.renderModelPanel.lookat)
+			local camPos = mdlPanel:GetCamPos()
+			mdlPanel:SetCamPos(camPos + itemTable.renderModelPanel.offset)
+			
+			mdlPanel:SetDisabled(true)
+			mdlPanel:SetKeyboardInputEnabled(false)
+			mdlPanel:SetMouseInputEnabled(false)
+
+			panel.Paint = function(this, width, height) end
+			panel.mdlPanel = mdlPanel
+
+		else
+			if (itemTable.exRender) then
+				panel.Icon:SetVisible(false)
+				panel.ExtraPaint = function(this, panelX, panelY)
+					local exIcon = ikon:GetIcon(itemTable.uniqueID)
+					if (exIcon) then
+						surface.SetMaterial(exIcon)
+						surface.SetDrawColor(color_white)
+						surface.DrawTexturedRect(0, 0, panelX, panelY)
+					else
+						ikon:renderIcon(
+							itemTable.uniqueID,
+							itemTable.width,
+							itemTable.height,
+							itemTable:GetModel(),
+							itemTable.iconCam
+						)
+					end
+				end
+			else
+				-- yeah..
+				RenderNewIcon(panel, itemTable)
+			end
+		end
+
 		panel:SetInventoryID(inventory:GetID())
 		panel:SetItemTable(itemTable)
 
 		if (self.panels[itemTable:GetID()]) then
 			self.panels[itemTable:GetID()]:Remove()
-		end
-
-		if (itemTable.exRender) then
-			panel.Icon:SetVisible(false)
-			panel.ExtraPaint = function(this, panelX, panelY)
-				local exIcon = ikon:GetIcon(itemTable.uniqueID)
-				if (exIcon) then
-					surface.SetMaterial(exIcon)
-					surface.SetDrawColor(color_white)
-					surface.DrawTexturedRect(0, 0, panelX, panelY)
-				else
-					ikon:renderIcon(
-						itemTable.uniqueID,
-						itemTable.width,
-						itemTable.height,
-						itemTable:GetModel(),
-						itemTable.iconCam
-					)
-				end
-			end
-		else
-			-- yeah..
-			RenderNewIcon(panel, itemTable)
 		end
 
 		panel.slots = {}
