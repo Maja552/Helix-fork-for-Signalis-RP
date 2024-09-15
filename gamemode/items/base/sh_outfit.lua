@@ -28,6 +28,25 @@ ITEM.bodyGroups = {
 }
 ]]--
 
+function ITEM:ResetBodygroups(client)
+	if istable(self.bodyGroupsUnequipped) or isfunction(self.bodyGroupsUnequipped) then
+		local bggroups = self.bodyGroupsUnequipped
+		if isfunction(self.bodyGroupsUnequipped) then
+			bggroups = self.bodyGroupsUnequipped(self, client)
+		end
+
+		for k, v in pairs(bggroups) do
+			local index = client:FindBodygroupByName(k)
+
+			if (index > -1) then
+				client:SetBodygroup(index, v)
+			end
+		end
+	else
+		client:ResetBodygroups()
+	end
+end
+
 -- Inventory drawing
 if (CLIENT) then
 	function ITEM:PaintOver(item, w, h)
@@ -50,13 +69,14 @@ function ITEM:AddOutfit(client)
 		character:SetData("oldGroups" .. self.outfitCategory, groups)
 		character:SetData("groups", {})
 
-		client:ResetBodygroups()
+		self:ResetBodygroups(client)
 	end
 
 	if (isfunction(self.OnGetReplacement)) then
 		character:SetData("oldModel" .. self.outfitCategory,
 			character:GetData("oldModel" .. self.outfitCategory, self.player:GetModel()))
 		character:SetModel(self:OnGetReplacement())
+		
 	elseif (self.replacement or self.replacements) then
 		character:SetData("oldModel" .. self.outfitCategory,
 			character:GetData("oldModel" .. self.outfitCategory, self.player:GetModel()))
@@ -87,9 +107,14 @@ function ITEM:AddOutfit(client)
 		for k, v in pairs(groups) do
 			client:SetBodygroup(k, v)
 		end
+
 	-- apply default item bodygroups if none are saved
-	elseif (istable(self.bodyGroups)) then
-		for k, v in pairs(self.bodyGroups) do
+	elseif (istable(self.bodyGroups) or isfunction(self.bodyGroups)) then
+		local bggroups = self.bodyGroups
+		if isfunction(self.bodyGroups) then
+			bggroups = self.bodyGroups(self, client)
+		end
+		for k, v in pairs(bggroups) do
 			local index = client:FindBodygroupByName(k)
 
 			if (index > -1) then
@@ -164,7 +189,7 @@ function ITEM:RemoveOutfit(client)
 	end
 
 	-- remove outfit bodygroups
-	client:ResetBodygroups()
+	self:ResetBodygroups(client)
 
 	-- restore the original player model
 	if (character:GetData("oldModel" .. self.outfitCategory)) then
@@ -281,7 +306,7 @@ ITEM.functions.Equip = {
 	OnCanRun = function(item)
 		local client = item.player
 
-		return !IsValid(item.entity) and IsValid(client) and item:GetData("equip") != true and item:CanEquipOutfit() and
+		return !IsValid(item.entity) and IsValid(client) and item:GetData("equip") != true and item:CanEquipOutfit(client) and
 			hook.Run("CanPlayerEquipItem", client, item) != false
 	end
 }
