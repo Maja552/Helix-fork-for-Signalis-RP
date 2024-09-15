@@ -9,7 +9,7 @@ local function RenderNewIcon(panel, itemTable)
 	local model = itemTable:GetModel()
 
 	-- re-render icons
-	if (itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender or FORCE_ICONCAM != nil)) then
+	if itemTable.iconCam and (!ICON_RENDER_QUEUE[string.lower(model)] or itemTable.forceRender or FORCE_ICONCAM != nil) then
 		local iconCam = itemTable.iconCam
 
 		-- for debugging
@@ -28,7 +28,7 @@ local function RenderNewIcon(panel, itemTable)
 		panel.Icon:RebuildSpawnIconEx(iconCam)
 	end
 
-	if (not itemTable.iconCam and itemTable.forceRender) or true then
+	if not itemTable.iconCam and itemTable.forceRender then
 		panel.Icon:RebuildSpawnIcon()
 	end
 end
