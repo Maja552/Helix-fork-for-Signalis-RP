@@ -7,7 +7,7 @@ ITEM.ammo = "pistol" -- type of the ammo
 ITEM.ammoAmount = 30 -- amount of the ammo
 ITEM.description = "A Box that contains %s of Pistol Ammo"
 ITEM.category = "Ammunition"
-ITEM.useSound = "items/ammo_pickup.wav"
+ITEM.useSound = "eternalis/items/equip.wav"
 
 function ITEM:GetDescription()
 	local rounds = self:GetData("rounds", self.ammoAmount)

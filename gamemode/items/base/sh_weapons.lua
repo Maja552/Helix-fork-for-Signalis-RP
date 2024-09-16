@@ -9,7 +9,7 @@ ITEM.height = 2
 ITEM.isWeapon = true
 ITEM.isGrenade = false
 ITEM.weaponCategory = "sidearm"
-ITEM.useSound = "items/ammo_pickup.wav"
+ITEM.useSound = "eternalis/items/equip.wav"
 
 -- Inventory drawing
 if (CLIENT) then
