@@ -73,15 +73,17 @@ do
 	end
 
 	function playerMeta:SaveData()
-		local name = self:SteamName()
-		local steamID64 = self:SteamID64()
+		if !self:IsBot() and self.ixData != nil then
+			local name = self:SteamName()
+			local steamID64 = self:SteamID64()
 
-		local query = mysql:Update("ix_players")
-			query:Update("steam_name", name)
-			query:Update("play_time", math.floor((self.ixPlayTime or 0) + (RealTime() - (self.ixJoinTime or RealTime() - 1))))
-			query:Update("data", util.TableToJSON(self.ixData))
-			query:Where("steamid", steamID64)
-		query:Execute()
+			local query = mysql:Update("ix_players")
+				query:Update("steam_name", name)
+				query:Update("play_time", math.floor((self.ixPlayTime or 0) + (RealTime() - (self.ixJoinTime or RealTime() - 1))))
+				query:Update("data", util.TableToJSON(self.ixData))
+				query:Where("steamid", steamID64)
+			query:Execute()
+		end
 	end
 
 	function playerMeta:SetData(key, value, bNoNetworking)
