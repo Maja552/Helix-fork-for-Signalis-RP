@@ -148,7 +148,8 @@ function ix.item.Register(uniqueID, baseID, isBaseItem, path, luaGenerated)
 					return false
 				end,
 				OnCanRun = function(item)
-					return !IsValid(item.entity) and !item.noDrop
+					return !IsValid(item.entity) and !item.noDrop and
+						hook.Run("CanPlayerDropItem", item.player, item) != false
 				end
 			}
 			ITEM.functions.take = ITEM.functions.take or {
@@ -662,7 +663,7 @@ do
 					result = item.hooks[action](item, data)
 				end
 
-				if (result == nil) then
+				if (result == nil and callback.OnRun) then
 					result = callback.OnRun(item, data)
 				end
 
