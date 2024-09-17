@@ -75,7 +75,7 @@ local function CalcStaminaChange(client)
 		return offset -- for the client we need to return the estimated stamina change
 	else
 		local current = client:GetLocalVar("stm", 0)
-		local value = math.Clamp(current + offset, 0, 100)
+		local value = math.Clamp(current + offset, 0, getMaxStamina(character))
 
 		if (current != value) then
 			client:SetLocalVar("stm", value)
@@ -138,21 +138,21 @@ if (SERVER) then
 
 	function playerMeta:RestoreStamina(amount)
 		local current = self:GetLocalVar("stm", 0)
-		local value = math.Clamp(current + amount, 0, getMaxStamina(character))
+		local value = math.Clamp(current + amount, 0, getMaxStamina(self:GetCharacter()))
 
 		self:SetLocalVar("stm", value)
 	end
 
 	function playerMeta:ConsumeStamina(amount)
 		local current = self:GetLocalVar("stm", 0)
-		local value = math.Clamp(current - amount, 0, getMaxStamina(character))
+		local value = math.Clamp(current - amount, 0, getMaxStamina(self:GetCharacter()))
 
 		self:SetLocalVar("stm", value)
 	end
 
 else
 
-	local predictedStamina = 100
+	local predictedStamina = getMaxStamina()
 
 	function PLUGIN:Think()
 		local offset = CalcStaminaChange(LocalPlayer())
@@ -166,6 +166,7 @@ else
 
 	function PLUGIN:OnLocalVarSet(key, var)
 		if (key != "stm") then return end
+
 		if (math.abs(predictedStamina - var) > 5) then
 			predictedStamina = var
 		end
