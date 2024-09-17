@@ -20,6 +20,8 @@ HOLDTYPE_TRANSLATOR["duel"] = "pistol"
 HOLDTYPE_TRANSLATOR["camera"] = "smg"
 HOLDTYPE_TRANSLATOR["magic"] = "normal"
 HOLDTYPE_TRANSLATOR["revolver"] = "pistol"
+HOLDTYPE_TRANSLATOR["spear"] = "grenade"
+HOLDTYPE_TRANSLATOR["daggerthrown"] = "grenade"
 
 -- luacheck: globals  PLAYER_HOLDTYPE_TRANSLATOR
 PLAYER_HOLDTYPE_TRANSLATOR = {}
