@@ -24,7 +24,7 @@ ix.config.Add("punchStamina", 10, "How much stamina punches use up.", nil, {
 })
 
 local function getMaxStamina(character)
-	if CLIENT then
+	if CLIENT and not character and isfunction(LocalPlayer) and LocalPlayer().GetCharacter then
 		character = LocalPlayer():GetCharacter()
 	end
 
