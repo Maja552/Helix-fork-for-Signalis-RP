@@ -514,7 +514,12 @@ do
 
 				icon = Material(hook.Run("GetPlayerIcon", speaker) or icon)
 
-				chat.AddText(icon, Color(255, 50, 50), "[OOC] ", speaker, color_white, ": "..text)
+				local plyText = speaker
+				if speaker:SteamName() != speaker:Name() and ix.option.Get("showOOCNicknames", false) then
+					plyText = speaker:Name() .. " (" .. speaker:SteamName() .. ")"
+				end
+
+				chat.AddText(icon, Color(255, 50, 50), "[OOC] ", team.GetColor(speaker:Team()), plyText, color_white, ": "..text)
 			end,
 			prefix = {"//", "/OOC"},
 			description = "@cmdOOC",

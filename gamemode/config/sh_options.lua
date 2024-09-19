@@ -43,6 +43,14 @@ if (CLIENT) then
 	ix.option.Add("showIntro", ix.type.bool, true, {
 		category = "general"
 	})
+
+	ix.option.Add("showIntro", ix.type.bool, true, {
+		category = "general"
+	})
+
+	ix.option.Add("showOOCNicknames", ix.type.bool, true, {
+		category = "chat"
+	})
 end
 
 ix.option.Add("language", ix.type.array, ix.config.language or "english", {
