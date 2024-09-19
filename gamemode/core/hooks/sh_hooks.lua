@@ -566,7 +566,28 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 				if istable(v.AcceptableItems) then
 					local acceptable = false
 					for k2, v2 in pairs(v.AcceptableItems) do
-						if itemObject.uniqueID == k2 then
+						if string.lower(itemObject.uniqueID) == string.lower(k2) then
+							if v2 then
+								acceptable = true
+							end
+							break
+						end
+					end
+
+					if !acceptable then
+						local owner = itemObject:GetOwner()
+
+						if (IsValid(owner)) then
+							owner:NotifyLocalized("notAcceptedBag")
+						end
+						return false
+					end
+				end
+
+				if istable(v.AcceptableCategories) then
+					local acceptable = false
+					for k2, v2 in pairs(v.AcceptableCategories) do
+						if string.lower(itemObject.category) == string.lower(k2) then
 							if v2 then
 								acceptable = true
 							end
@@ -587,7 +608,7 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 				if istable(v.AcceptableBases) then
 					local acceptable = false
 					for k2, v2 in pairs(v.AcceptableBases) do
-						if itemObject.base == k2 then
+						if string.lower(itemObject.base) == string.lower(k2) then
 							if v2 then
 								acceptable = true
 							end
