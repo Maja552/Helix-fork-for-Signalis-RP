@@ -563,8 +563,9 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 		for k,v in pairs(ix.item.list) do
 			if k == inventory.vars.isBag then
 
+				local acceptable = false
+
 				if istable(v.AcceptableItems) then
-					local acceptable = false
 					for k2, v2 in pairs(v.AcceptableItems) do
 						if string.lower(itemObject.uniqueID) == string.lower(k2) then
 							if v2 then
@@ -573,19 +574,9 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 							break
 						end
 					end
-
-					if !acceptable then
-						local owner = itemObject:GetOwner()
-
-						if (IsValid(owner)) then
-							owner:NotifyLocalized("notAcceptedBag")
-						end
-						return false
-					end
 				end
 
-				if istable(v.AcceptableCategories) then
-					local acceptable = false
+				if !acceptable and istable(v.AcceptableCategories) then
 					for k2, v2 in pairs(v.AcceptableCategories) do
 						if string.lower(itemObject.category) == string.lower(k2) then
 							if v2 then
@@ -594,19 +585,9 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 							break
 						end
 					end
-
-					if !acceptable then
-						local owner = itemObject:GetOwner()
-
-						if (IsValid(owner)) then
-							owner:NotifyLocalized("notAcceptedBag")
-						end
-						return false
-					end
 				end
 
-				if istable(v.AcceptableBases) then
-					local acceptable = false
+				if !acceptable and istable(v.AcceptableBases) then
 					for k2, v2 in pairs(v.AcceptableBases) do
 						if string.lower(itemObject.base) == string.lower(k2) then
 							if v2 then
@@ -615,15 +596,15 @@ function GM:CanTransferItem(itemObject, curInv, inventory)
 							break
 						end
 					end
+				end
 
-					if !acceptable then
-						local owner = itemObject:GetOwner()
+				if !acceptable then
+					local owner = itemObject:GetOwner()
 
-						if (IsValid(owner)) then
-							owner:NotifyLocalized("notAcceptedBag")
-						end
-						return false
+					if (IsValid(owner)) then
+						owner:NotifyLocalized("notAcceptedBag")
 					end
+					return false
 				end
 
 				break
