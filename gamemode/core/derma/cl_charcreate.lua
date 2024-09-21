@@ -590,9 +590,9 @@ function PANEL:PopulateSegments()
 
 	self.progress:AddSegment("@description")
 
-	if (#self.attributesPanel:GetChildren() > 1) then
-		self.progress:AddSegment("@skills")
-	end
+	--if (#self.attributesPanel:GetChildren() > 1) then
+		--self.progress:AddSegment("@skills")
+	--end
 
 	-- we don't need to show the progress bar if there's only one segment
 	if (#self.progress:GetSegments() == 1) then
@@ -733,6 +733,11 @@ function PANEL:Populate(redo)
 					self.payload:Set(k, text)
 				end
 
+				if v.setDefault then
+					panel:SetText(v.default)
+					self.payload:Set(k, v.default)
+				end
+
 			elseif (isnumber(v.default)) then
 				panel = container:Add("ixTextEntry")
 				panel:SetHeight(64)
@@ -751,6 +756,11 @@ function PANEL:Populate(redo)
 					end
 
 					self.payload:Set(k, value)
+				end
+
+				if v.setDefault then
+					panel:SetText(v.default)
+					self.payload:Set(k, v.default)
 				end
 			end
 

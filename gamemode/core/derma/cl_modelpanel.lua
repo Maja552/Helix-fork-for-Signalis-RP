@@ -36,8 +36,22 @@ function PANEL:SetModel(model)
 		entity:SetSkin(model.skin)
 	end
 
-	if (model.bodygroups) then
+	if isstring(model.bodygroups) then
 		entity:SetBodyGroups(model.bodygroups)
+
+	elseif istable(model.bodygroups) then
+		for k, v in pairs(model.bodygroups) do
+			if isstring(k) then
+				local index = entity:FindBodygroupByName(k)
+
+				if (index > -1) then
+					entity:SetBodygroup(index, v)
+				end
+				
+			elseif isnumber(k) then
+				entity:SetBodygroup(k, v)
+			end
+		end
 	end
 
 	local sequence = entity:LookupSequence("idle_unarmed")

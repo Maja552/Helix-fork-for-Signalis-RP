@@ -382,6 +382,7 @@ do
 		field = "pitch",
 		fieldType = ix.type.number,
 		default = 100,
+		setDefault = true,
 		decimals = 0,
 		min = 90,
 		max = 110,
@@ -402,7 +403,9 @@ do
 			return value
 		end,
 		ShouldDisplay = function(self, container, payload)
-			return payload["faction"] == FACTION_GESTALT
+			local class = ix.class.list[payload["class"]]
+			if class == nil then return false end
+			return class.talkPitch == nil
 		end,
 		OnValueChanged = function(self, value, payload)
 			-- make a timer to test the new talk speed by playing the sound for a few times
@@ -419,6 +422,7 @@ do
 		field = "talkspeed",
 		fieldType = ix.type.number,
 		default = 1.0,
+		setDefault = true,
 		decimals = 1,
 		min = 0.8,
 		max = 1.1,
@@ -439,7 +443,10 @@ do
 			return value
 		end,
 		ShouldDisplay = function(self, container, payload)
-			return payload["faction"] == FACTION_GESTALT
+			--return payload["faction"] == FACTION_GESTALT
+			local class = ix.class.list[payload["class"]]
+			if class == nil then return false end
+			return class.talkSpeed == nil
 		end,
 		OnValueChanged = function(self, value, payload)
 			-- make a timer to test the new talk speed by playing the sound for a few times
@@ -561,8 +568,23 @@ do
 					end
 					icon.PreDrawModel = function(self, ent)
 						ent:SetSkin(self.skin or 0)
-						if v.bodygroups then
+
+						if isstring(v.bodygroups) then
 							ent:SetBodyGroups(v.bodygroups)
+					
+						elseif istable(v.bodygroups) then
+							for k2, v2 in pairs(v.bodygroups) do
+								if isstring(k2) then
+									local index = ent:FindBodygroupByName(k2)
+					
+									if (index > -1) then
+										ent:SetBodygroup(index, v2)
+									end
+
+								elseif isnumber(k2) then
+									ent:SetBodygroup(k2, v2)
+								end
+							end
 						end
 					end
 
@@ -641,11 +663,28 @@ do
 					-- save skin/bodygroups to character data
 					local bodygroups = {}
 
-					if model.bodygroups then
+					if istable(model.bodygroups) then
+						/*
+						for k,v in pairs(model.bodygroups) do
+							if isstring(k) then
+								local index = entity:FindBodygroupByName(k)
+				
+								if (index > -1) then
+									bodygroups[index] = tonumber(v) or 0
+								end
+								
+							elseif isnumber(k) then
+								bodygroups[k] = tonumber(v) or 0
+							end
+						end
+						*/
+
+						
 						for i = 1, #model.bodygroups do
 							bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
 							--print("bodygroup nr. "..i .. " = " .. bodygroups[i - 1])
 						end
+						
 					end
 
 					newData.data = newData.data or {}
