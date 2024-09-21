@@ -86,7 +86,7 @@ function PANEL:Init()
 	self.factionButtonsPanel:Dock(BOTTOM)
 
 	self.classPanel = self:AddSubpanel("class", true)
-	self.classPanel:SetTitle("chooseClass")
+	self.classPanel:SetTitle("CHOOSE A CLASS")
 	self.classPanel.OnSetActive = function()
 		-- if we only have one class, we are always selecting that one so we can skip to the description section
 		if (#self.classButtons == 1) then
