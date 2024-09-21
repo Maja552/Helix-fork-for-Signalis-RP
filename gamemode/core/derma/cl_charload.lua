@@ -28,13 +28,6 @@ local function SetCharacter(self, character)
 			end
 		end
 
-		/*
-		self:SetPos(Vector(0, 0, 0))
-		if SIGNALIS_MODEL_HEIGHT_FIXES[self:GetModel()] then
-			self:SetPos(Vector(0, 0, SIGNALIS_MODEL_HEIGHT_FIXES[self:GetModel()]))
-		end
-		*/
-
 		self:SetPos(Vector(0, 0, 0))
 		local bone = self:LookupBone("ValveBiped.Bip01_Neck1")
 		if bone then
