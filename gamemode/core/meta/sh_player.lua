@@ -534,27 +534,29 @@ if (SERVER) then
 
 			for _, v in ipairs(self:GetWeapons()) do
 				-- drop active weapon
-				local dItem = v.ixItem
-				if entity.ixActiveWeapon == v:GetClass() and dItem then
-					local isEquipped = dItem:GetData("equip", false)
-					if isEquipped then
-						dItem:Unequip(self, false)
-					end
-					--dItem:SetData("equip", false)
-
-					local eyepos = self:EyePos()
-					local eyeang = self:EyeAngles()
-					local aimvector = self:GetAimVector()
-
-					local droppedEnt = dItem:Transfer(nil, nil, nil, self)
-					if isentity(droppedEnt) then
-						droppedEnt:SetPos(eyepos + (aimvector * 20))
-						droppedEnt:SetAngles(eyeang)
-
-						dItem.player = nil
-
+				if ix.config.Get("dropActiveWeaponOnDeath", false) then
+					local dItem = v.ixItem
+					if entity.ixActiveWeapon == v:GetClass() and dItem then
+						local isEquipped = dItem:GetData("equip", false)
 						if isEquipped then
-							self:StripWeapon(v:GetClass())
+							dItem:Unequip(self, false)
+						end
+						--dItem:SetData("equip", false)
+
+						local eyepos = self:EyePos()
+						local eyeang = self:EyeAngles()
+						local aimvector = self:GetAimVector()
+
+						local droppedEnt = dItem:Transfer(nil, nil, nil, self)
+						if isentity(droppedEnt) then
+							droppedEnt:SetPos(eyepos + (aimvector * 20))
+							droppedEnt:SetAngles(eyeang)
+
+							dItem.player = nil
+
+							if isEquipped then
+								self:StripWeapon(v:GetClass())
+							end
 						end
 					end
 				end

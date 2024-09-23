@@ -20,6 +20,10 @@ ix.config.Add("allowMultipleCharacterInteraction", true, "Allow different charac
 	category = "characters"
 })
 
+ix.config.Add("dropActiveWeaponOnDeath", true, "Drop active weapon on death", nil, {
+	category = "weapons"
+})
+
 ix.config.Add("color", Color(168, 2, 11, 255), "The main color theme for the framework.", function(oldValue, newValue)
 	if (newValue.a != 255) then
 		ix.config.Set("color", ColorAlpha(newValue, 255))
