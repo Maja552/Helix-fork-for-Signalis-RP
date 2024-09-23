@@ -534,27 +534,29 @@ if (SERVER) then
 
 			for _, v in ipairs(self:GetWeapons()) do
 				-- drop active weapon
-				if entity.ixActiveWeapon == v:GetClass() and v.ixItem then
-					local isEquipped = v.ixItem:GetData("equip", false)
-					v.ixItem:SetData("equip", false)
+				local dItem = v.ixItem
+				if entity.ixActiveWeapon == v:GetClass() and dItem then
+					local isEquipped = dItem:GetData("equip", false)
+					if isEquipped then
+						dItem:Unequip(self, false)
+					end
+					--dItem:SetData("equip", false)
 
 					local eyepos = self:EyePos()
 					local eyeang = self:EyeAngles()
 					local aimvector = self:GetAimVector()
 
-					local droppedEnt = v.ixItem:Transfer(nil, nil, nil, self)
+					local droppedEnt = dItem:Transfer(nil, nil, nil, self)
 					if isentity(droppedEnt) then
 						droppedEnt:SetPos(eyepos + (aimvector * 20))
 						droppedEnt:SetAngles(eyeang)
 
-						v.ixItem.player = nil
+						dItem.player = nil
 
 						if isEquipped then
 							self:StripWeapon(v:GetClass())
 						end
 					end
-
-					print("dropping active weapon:", droppedEnt)
 				end
 
 				if (v.ixItem and v.ixItem.Equip and v.ixItem.Unequip) then
