@@ -36,7 +36,9 @@ if (SERVER) then
 		if (self.ixSteamID and self.ixCharID) then
 			local char = activator:GetCharacter()
 
-			if (char and self.ixCharID != char:GetID() and self.ixSteamID == activator:SteamID()) then
+			if (char and self.ixCharID != char:GetID() and self.ixSteamID == activator:SteamID()
+				and !ix.config.Get("allowMultipleCharacterInteraction", false)
+			) then
 				activator:NotifyLocalized("itemOwned")
 				return false
 			end

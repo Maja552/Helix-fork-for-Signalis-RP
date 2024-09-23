@@ -16,6 +16,10 @@ ix.config.Add("maxCharacters", 5, "The maximum number of characters a player can
 	category = "characters"
 })
 
+ix.config.Add("allowMultipleCharacterInteraction", true, "Allow different characters of the same player use the same items.", nil, {
+	category = "characters"
+})
+
 ix.config.Add("color", Color(168, 2, 11, 255), "The main color theme for the framework.", function(oldValue, newValue)
 	if (newValue.a != 255) then
 		ix.config.Set("color", ColorAlpha(newValue, 255))

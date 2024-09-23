@@ -829,7 +829,8 @@ if (SERVER) then
 			end
 
 			-- we need to check for owner since the item instance already exists
-			if (!item.bAllowMultiCharacterInteraction and IsValid(client) and client:GetCharacter() and
+			if (!ix.config.Get("allowMultipleCharacterInteraction", false) and
+				!item.bAllowMultiCharacterInteraction and IsValid(client) and client:GetCharacter() and
 				item:GetPlayerID() == client:SteamID64() and item:GetCharacterID() != client:GetCharacter():GetID()) then
 				return false, "itemOwned"
 			end
