@@ -285,7 +285,9 @@ function SWEP:DropObject(bThrow)
 	self.lastPlayerAngles = nil
 	self:GetOwner():SetLocalVar("bIsHoldingObject", false)
 
-	self.constraint:Remove()
+	if IsValid(self.constraint) then
+		self.constraint:Remove()
+	end
 	self.holdEntity:Remove()
 
 	self.heldEntity:StopMotionController()

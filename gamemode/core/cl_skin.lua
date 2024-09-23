@@ -101,6 +101,8 @@ function SKIN:DrawHelix(x, y, width, height, segments, color, fraction, speed)
 end
 
 function SKIN:PaintFrame(panel)
+	if !IsValid(panel) then return end
+
 	if (!panel.bNoBackgroundBlur) then
 		ix.util.DrawBlur(panel, 10)
 	end

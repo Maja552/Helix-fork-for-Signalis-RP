@@ -475,6 +475,7 @@ if (SERVER) then
 
 								self:SetAmmo(v.ammo, weapon:GetPrimaryAmmoType())
 								weapon:SetClip1(v.clip)
+
 							elseif (v.item and v.invID == v.item.invID) then
 								v.item:Equip(self, true, true)
 								self:SetAmmo(v.ammo, self.carryWeapons[v.item.weaponCategory]:GetPrimaryAmmoType())
@@ -532,6 +533,30 @@ if (SERVER) then
 			end
 
 			for _, v in ipairs(self:GetWeapons()) do
+				-- drop active weapon
+				if entity.ixActiveWeapon == v:GetClass() and v.ixItem then
+					local isEquipped = v.ixItem:GetData("equip", false)
+					v.ixItem:SetData("equip", false)
+
+					local eyepos = self:EyePos()
+					local eyeang = self:EyeAngles()
+					local aimvector = self:GetAimVector()
+
+					local droppedEnt = v.ixItem:Transfer(nil, nil, nil, self)
+					if isentity(droppedEnt) then
+						droppedEnt:SetPos(eyepos + (aimvector * 20))
+						droppedEnt:SetAngles(eyeang)
+
+						v.ixItem.player = nil
+
+						if isEquipped then
+							self:StripWeapon(v:GetClass())
+						end
+					end
+
+					print("dropping active weapon:", droppedEnt)
+				end
+
 				if (v.ixItem and v.ixItem.Equip and v.ixItem.Unequip) then
 					entity.ixWeapons[#entity.ixWeapons + 1] = {
 						item = v.ixItem,
@@ -600,6 +625,7 @@ if (SERVER) then
 
 			self:SetLocalVar("ragdoll", entity:EntIndex())
 			hook.Run("OnCharacterFallover", self, entity, true)
+
 		elseif (IsValid(self.ixRagdoll)) then
 			self.ixRagdoll:Remove()
 

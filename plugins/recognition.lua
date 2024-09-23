@@ -82,7 +82,7 @@ if (CLIENT) then
 	end
 
 	function PLUGIN:GetCharacterName(client, chatType)
-		if (client != LocalPlayer()) then
+		if (client and client != LocalPlayer()) then
 			local character = client:GetCharacter()
 			local ourCharacter = LocalPlayer():GetCharacter()
 
