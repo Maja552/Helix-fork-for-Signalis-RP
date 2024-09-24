@@ -239,6 +239,11 @@ function PANEL:Init()
 
 		self.progress:DecrementProgress()
 
+		if (#self.factionButtons > 1) then
+			self:SetActiveSubpanel("faction")
+			return
+		end
+
 		self:Populate()
 		self:SetActiveSubpanel("class", 0)
 		self:SlideDown()
