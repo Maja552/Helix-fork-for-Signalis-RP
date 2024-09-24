@@ -680,15 +680,15 @@ do
 						*/
 					--end
 
-					for i = 1, #model.bodygroups do
-						bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
+					if model.bodygroups then
+						for i = 1, #model.bodygroups do
+							bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
+						end
 					end
 
 					newData.data = newData.data or {}
 					newData.data.skin = model.skin or 0
 					newData.data.groups = bodygroups
-					print("newData.data.groups")
-					PrintTable(newData.data.groups)
 				end
 			end
 		end,
