@@ -663,7 +663,7 @@ do
 					-- save skin/bodygroups to character data
 					local bodygroups = {}
 
-					if istable(model.bodygroups) then
+					--if istable(model.bodygroups) then
 						/*
 						for k,v in pairs(model.bodygroups) do
 							if isstring(k) then
@@ -678,18 +678,17 @@ do
 							end
 						end
 						*/
+					--end
 
-						
-						for i = 1, #model.bodygroups do
-							bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
-							--print("bodygroup nr. "..i .. " = " .. bodygroups[i - 1])
-						end
-						
+					for i = 1, #model.bodygroups do
+						bodygroups[i - 1] = tonumber(model.bodygroups[i]) or 0
 					end
 
 					newData.data = newData.data or {}
 					newData.data.skin = model.skin or 0
 					newData.data.groups = bodygroups
+					print("newData.data.groups")
+					PrintTable(newData.data.groups)
 				end
 			end
 		end,
