@@ -280,14 +280,18 @@ function PANEL:Init()
 
 		self.progress:DecrementProgress()
 
+		-- If there is only one class, go to faction
 		if (#self.classButtons < 2) then
 			self.progress:DecrementProgress()
+			self:SetActiveSubpanel("faction")
+			return
 		end
 
+		-- If there is only one faction, go to start, else go to class
 		if (#self.factionButtons == 1) then
 			factionBack:DoClick()
 		else
-			self:SetActiveSubpanel("faction")
+			self:SetActiveSubpanel("class")
 		end
 	end
 
