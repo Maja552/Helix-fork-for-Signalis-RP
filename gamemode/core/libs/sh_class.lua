@@ -77,7 +77,15 @@ function ix.class.LoadFromDir(directory)
 
 			if (!CLASS.GetModels) then
 				function CLASS:GetModels(client)
-					return self.models
+					local models = {}
+
+					for _, v in pairs(self.models) do
+						if !isfunction(v.canUse) or isfunction(v.canUse) and v.canUse(client) then
+							table.insert(models, v)
+						end
+					end
+
+					return models
 				end
 			end
 
