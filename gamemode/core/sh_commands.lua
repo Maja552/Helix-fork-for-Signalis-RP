@@ -3,8 +3,12 @@ local function isValidSteamid(steamid)
 	return string.match(steamid, "^STEAM_[01]:[01]:%d+$") ~= nil or string.match(steamid, "^7656119%d+$") ~= nil
 end
 
-local function isEternalisPlayerVerified(steamid)
-    local jsonDB = file.Read("eternalis/db.json", "DATA")
+local function isSignalisRPPlayerVerified(steamid)
+		if !ix.config.Get("signalisRPverification", false) then
+				return true
+		end
+
+    local jsonDB = file.Read("signalis_rp_verification/db.json", "DATA")
     if jsonDB then
         local database = util.JSONToTable(jsonDB, false, true)
         local playerData = database[steamid]
@@ -696,7 +700,7 @@ ix.command.Add("PlyWhitelistFaction", {
 					target = util.SteamIDTo64(target)
 				end
 
-				if !isEternalisPlayerVerified(target) then
+				if !isSignalisRPPlayerVerified(target) then
 					return "@playedNotVerified"
 				end
 
@@ -772,7 +776,7 @@ ix.command.Add("PlyWhitelistClass", {
 					target = util.SteamIDTo64(target)
 				end
 
-				if !isEternalisPlayerVerified(target) then
+				if !isSignalisRPPlayerVerified(target) then
 					return "@playedNotVerified"
 				end
 
@@ -824,7 +828,7 @@ ix.command.Add("PlyForceWhitelistClass", {
 					target = util.SteamIDTo64(target)
 				end
 
-				if !isEternalisPlayerVerified(target) then
+				if !isSignalisRPPlayerVerified(target) then
 					return "@playedNotVerified"
 				end
 				
